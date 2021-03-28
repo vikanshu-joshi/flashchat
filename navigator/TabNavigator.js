@@ -2,6 +2,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import * as RouteNames from '../config/Routes';
 import Logs from '../screens/Logs';
 import Chats from '../screens/Chats';
+import React from 'react';
 
 const Tab = createMaterialTopTabNavigator();
 

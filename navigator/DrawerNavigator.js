@@ -1,3 +1,4 @@
+import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import * as RouteNames from '../config/Routes';
 import Contacts from '../screens/Contacts';

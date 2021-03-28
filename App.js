@@ -1,25 +1,22 @@
+import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Text} from 'react-native-paper';
+import {Provider} from 'react-redux';
+import {createStore, applyMiddleware, combineReducers} from 'redux';
+import thunk from 'redux-thunk';
+import AuthNavigator from './navigator/AuthNavigator';
+
+// const rootReducer = combineReducers({});
+
+// const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const App = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>FlashChat</Text>
-    </View>
+    // <Provider store={store}>
+    <NavigationContainer>
+      <AuthNavigator />
+    </NavigationContainer>
+    // </Provider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  label: {
-    fontFamily: 'Montserrat-Bold',
-    fontSize: 32,
-  },
-});
 
 export default App;

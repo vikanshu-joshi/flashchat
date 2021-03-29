@@ -25,7 +25,7 @@ function SearchBar({onSearch}) {
         }}
         icon="magnify"
         onPress={e => {
-          onSearch();
+          onSearch(state.query);
           Keyboard.dismiss();
         }}
       />

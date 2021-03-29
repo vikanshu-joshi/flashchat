@@ -1,17 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Divider, ProgressBar, Text} from 'react-native-paper';
 import {FlatList, RefreshControl, StyleSheet, View} from 'react-native';
-import SearchBar from '../components/SearchBar';
 import {useDispatch, useSelector} from 'react-redux';
 import UserTile from '../components/UserTile';
 import firebase from '../config/firebase';
 import {fetchAsync} from '../redux/reducer/BookmarkedReducer';
+import {useNavigation} from '@react-navigation/core';
 import {RemoveBookmark} from '../redux/action/BookmarkedActions';
+import {MESSAGES_SCREEN} from '../config/Routes';
 
 const SavedUsers = ({navigation}) => {
   const dispatch = useDispatch();
   const bookmarks = useSelector(state => state.bookmarkedState);
-  console.log(bookmarks);
+  const navigator = useNavigation();
   const onRefresh = () => dispatch(fetchAsync());
   useEffect(() => {
     if (bookmarks.bookmarkedUsers.length === 0) {
@@ -53,7 +54,9 @@ const SavedUsers = ({navigation}) => {
               {...item}
               darkMode={false}
               isSaved={true}
-              onUserSelected={({id, photoURL, displayName}) => {}}
+              onUserSelected={({id, photoURL, displayName}) =>
+                navigator.navigate(MESSAGES_SCREEN, {id, photoURL, displayName})
+              }
               onUserBookmarked={({id, photoURL, displayName, isSaved}) => {
                 firebase
                   .firestore()

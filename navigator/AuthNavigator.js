@@ -7,6 +7,7 @@ import Splash from '../screens/Splash';
 import DrawerNavigator from './DrawerNavigator';
 import {IconButton} from 'react-native-paper';
 import Search from '../screens/Search';
+import Messages from '../screens/Messages';
 
 const Stack = createStackNavigator();
 
@@ -47,6 +48,14 @@ const AuthNavigator = () => {
         options={{
           headerShown: true,
         }}
+      />
+      <Stack.Screen
+        name={RouteNames.MESSAGES_SCREEN}
+        component={Messages}
+        options={({route}) => ({
+          title: route.params.displayName,
+          headerShown: true,
+        })}
       />
     </Stack.Navigator>
   );

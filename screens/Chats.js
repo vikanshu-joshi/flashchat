@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
 
 const Chats = ({navigation}) => {
+  useEffect(() => {}, [navigation]);
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Chats</Text>

@@ -6,6 +6,7 @@ import Login from '../screens/Login';
 import Splash from '../screens/Splash';
 import DrawerNavigator from './DrawerNavigator';
 import {IconButton} from 'react-native-paper';
+import Search from '../screens/Search';
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,13 @@ const AuthNavigator = () => {
         component={DrawerNavigator}
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={RouteNames.SEARCH_SCREEN}
+        component={Search}
+        options={{
+          headerShown: true,
         }}
       />
     </Stack.Navigator>

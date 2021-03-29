@@ -8,9 +8,10 @@ import firebase from '../config/firebase';
 import {fetchAsync} from '../redux/reducer/BookmarkedReducer';
 import {RemoveBookmark} from '../redux/action/BookmarkedActions';
 
-const Contacts = ({navigation}) => {
+const SavedUsers = ({navigation}) => {
   const dispatch = useDispatch();
   const bookmarks = useSelector(state => state.bookmarkedState);
+  console.log(bookmarks);
   const onRefresh = () => dispatch(fetchAsync());
   useEffect(() => {
     if (bookmarks.bookmarkedUsers.length === 0) {
@@ -34,6 +35,7 @@ const Contacts = ({navigation}) => {
         </View>
       ) : (
         <FlatList
+          refreshing={bookmarks.loading}
           refreshControl={<RefreshControl onRefresh={onRefresh} />}
           data={bookmarks.bookmarkedUsers}
           keyExtractor={item => item.id.toString()}
@@ -80,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Contacts;
+export default SavedUsers;

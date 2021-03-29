@@ -3,7 +3,7 @@ import {ProgressBar} from 'react-native-paper';
 import {StyleSheet, View} from 'react-native';
 import SearchBar from '../components/SearchBar';
 
-const SentRequests = () => {
+const BlockedUsers = () => {
   const [state, setstate] = useState({
     loading: false,
   });
@@ -28,4 +28,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SentRequests;
+export default BlockedUsers;

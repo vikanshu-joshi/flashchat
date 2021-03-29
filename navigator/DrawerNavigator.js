@@ -5,7 +5,7 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import * as RouteNames from '../config/Routes';
-import Contacts from '../screens/Contacts';
+import Contacts from '../screens/SavedUsers';
 import Github from '../screens/Github';
 import Settings from '../screens/Settings';
 import RequestsTabNavigator from './RequestsTabNavigator';
@@ -92,9 +92,8 @@ const DrawerNavigator = () => {
       }}>
       <Drawer.Screen name={RouteNames.TAB_NAVIGATOR} component={TabNavigator} />
       <Drawer.Screen name={RouteNames.SETTINGS_SCREEN} component={Settings} />
-      <Drawer.Screen name={RouteNames.CONTACTS_SCREEN} component={Contacts} />
       <Drawer.Screen
-        name={RouteNames.REQUESTS_SCREEN}
+        name={RouteNames.CONTACTS_SCREEN}
         component={RequestsTabNavigator}
       />
       <Drawer.Screen name={RouteNames.GITHUB_SCREEN} component={Github} />

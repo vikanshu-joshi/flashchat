@@ -9,13 +9,7 @@ const initialState = {
 
 export const fetchAsync = () => {
   return dispatch => {
-    dispatch(
-      BookmarkedAction.SaveAll({
-        bookmarked: [],
-        ids: [],
-        loading: true,
-      }),
-    );
+    dispatch(BookmarkedAction.LoadingBookmarks());
     const newState = initialState;
     firebase
       .firestore()
@@ -28,13 +22,14 @@ export const fetchAsync = () => {
           newState.bookmarkedUsers.push(document.data());
           newState.ids.push(document.id);
         });
-        dispatch(
-          BookmarkedAction.SaveAll({
-            bookmarked: newState.bookmarkedUsers,
-            ids: newState.ids,
-            loading: false,
-          }),
-        );
+        setTimeout(() => {
+          dispatch(
+            BookmarkedAction.SaveAll({
+              bookmarked: newState.bookmarkedUsers,
+              ids: newState.ids,
+            }),
+          );
+        }, 2000);
       })
       .catch(ex => {});
   };
@@ -42,29 +37,40 @@ export const fetchAsync = () => {
 
 export const BookmarkedReducer = (state = initialState, action) => {
   if (action.type === BookmarkedAction.SAVE_ALL) {
-    state.bookmarkedUsers = action.bookmarked;
-    state.ids = action.ids;
-    state.loading = action.loading;
-    return {...state};
+    state = initialState;
+    return {
+      bookmarkedUsers: [...action.bookmarked],
+      ids: [...action.ids],
+      loading: false,
+    };
   } else if (action.type === BookmarkedAction.ADD_BOOKMARKED_USER) {
-    state.bookmarkedUsers = [
-      ...state.bookmarkedUsers,
-      {
-        id: action.id,
-        photoURL: action.photoURL,
-        displayName: action.displayName,
-      },
-    ];
-    state.ids = [...state.ids, action.id];
-    state.loading = false;
-    return {...state};
+    return {
+      ...state,
+      bookmarkedUsers: [
+        ...state.bookmarkedUsers,
+        {
+          id: action.id,
+          photoURL: action.photoURL,
+          displayName: action.displayName,
+        },
+      ],
+      ids: [...state.ids, action.id],
+      loading: false,
+    };
   } else if (action.type === BookmarkedAction.REMOVE_BOOKMARKED_USER) {
-    state.bookmarkedUsers = state.bookmarkedUsers.filter(
-      user => user.id !== action.id,
-    );
-    state.ids = state.ids.filter(id => id !== action.id);
-    state.loading = false;
-    return {...state};
+    return {
+      ...state,
+      bookmarkedUsers: state.bookmarkedUsers.filter(
+        user => user.id !== action.id,
+      ),
+      ids: state.ids.filter(id => id !== action.id),
+      loading: false,
+    };
+  } else if (action.type === BookmarkedAction.LOADING_BOOKMARKS) {
+    return {
+      ...state,
+      loading: true,
+    };
   }
   return state;
 };

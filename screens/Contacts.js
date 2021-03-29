@@ -1,11 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {ProgressBar} from 'react-native-paper';
 import {StyleSheet, View} from 'react-native';
-import {Text} from 'react-native-paper';
+import SearchBar from '../components/SearchBar';
 
 const Contacts = () => {
+  const [state, setstate] = useState({
+    loading: false,
+  });
+  const onSearch = query => {
+    setstate({...state, loading: true});
+  };
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Contacts</Text>
+      <SearchBar onSearch={onSearch} />
+      {state.loading && <ProgressBar indeterminate={true} />}
     </View>
   );
 };
@@ -13,8 +21,6 @@ const Contacts = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   label: {
     fontFamily: 'Montserrat-Bold',

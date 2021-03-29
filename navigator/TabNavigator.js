@@ -2,11 +2,11 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import * as RouteNames from '../config/Routes';
 import Logs from '../screens/Logs';
 import Chats from '../screens/Chats';
-import React from 'react';
+import React, {useEffect} from 'react';
 
 const Tab = createMaterialTopTabNavigator();
 
-function TabNavigator() {
+function TabNavigator({navigation}) {
   return (
     <Tab.Navigator
       initialRouteName={RouteNames.CHAT_SCREEN}

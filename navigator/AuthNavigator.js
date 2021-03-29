@@ -5,6 +5,7 @@ import Signup from '../screens/Signup';
 import Login from '../screens/Login';
 import Splash from '../screens/Splash';
 import DrawerNavigator from './DrawerNavigator';
+import {IconButton} from 'react-native-paper';
 
 const Stack = createStackNavigator();
 
@@ -36,8 +37,7 @@ const AuthNavigator = () => {
         name={RouteNames.DRAWER_NAVIGATOR}
         component={DrawerNavigator}
         options={{
-          headerShown: true,
-          headerBackTitle: 'Home',
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

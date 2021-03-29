@@ -4,10 +4,18 @@ import * as BookmarkedAction from '../action/BookmarkedActions';
 const initialState = {
   bookmarkedUsers: [],
   ids: [],
+  loading: false,
 };
 
 export const fetchAsync = () => {
   return dispatch => {
+    dispatch(
+      BookmarkedAction.SaveAll({
+        bookmarked: [],
+        ids: [],
+        loading: true,
+      }),
+    );
     const newState = initialState;
     firebase
       .firestore()
@@ -16,16 +24,15 @@ export const fetchAsync = () => {
       .collection('bookmarked')
       .get()
       .then(snapshot => {
-        console.log('fetched', snapshot.size);
         snapshot.docs.forEach(document => {
           newState.bookmarkedUsers.push(document.data());
           newState.ids.push(document.id);
         });
-        console.log('dispatching', newState);
         dispatch(
           BookmarkedAction.SaveAll({
             bookmarked: newState.bookmarkedUsers,
             ids: newState.ids,
+            loading: false,
           }),
         );
       })
@@ -35,28 +42,29 @@ export const fetchAsync = () => {
 
 export const BookmarkedReducer = (state = initialState, action) => {
   if (action.type === BookmarkedAction.SAVE_ALL) {
-    return {bookmarkedUsers: action.bookmarked, ids: action.ids};
+    state.bookmarkedUsers = action.bookmarked;
+    state.ids = action.ids;
+    state.loading = action.loading;
+    return {...state};
   } else if (action.type === BookmarkedAction.ADD_BOOKMARKED_USER) {
-    return {
-      ...state,
-      bookmarkedUsers: [
-        ...state.bookmarkedUsers,
-        {
-          id: action.id,
-          photoURL: action.photoURL,
-          displayName: action.displayName,
-        },
-      ],
-      ids: [...state.ids, action.id],
-    };
+    state.bookmarkedUsers = [
+      ...state.bookmarkedUsers,
+      {
+        id: action.id,
+        photoURL: action.photoURL,
+        displayName: action.displayName,
+      },
+    ];
+    state.ids = [...state.ids, action.id];
+    state.loading = false;
+    return {...state};
   } else if (action.type === BookmarkedAction.REMOVE_BOOKMARKED_USER) {
-    return {
-      ...state,
-      bookmarkedUsers: state.bookmarkedUsers.filter(
-        user => user.id !== action.id,
-      ),
-      ids: state.ids.filter(id => id !== action.id),
-    };
+    state.bookmarkedUsers = state.bookmarkedUsers.filter(
+      user => user.id !== action.id,
+    );
+    state.ids = state.ids.filter(id => id !== action.id);
+    state.loading = false;
+    return {...state};
   }
   return state;
 };

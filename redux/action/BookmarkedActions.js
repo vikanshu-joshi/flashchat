@@ -2,11 +2,12 @@ export const SAVE_ALL = 'save all bookmarked users';
 export const ADD_BOOKMARKED_USER = 'add new bookmarked user';
 export const REMOVE_BOOKMARKED_USER = 'remove bookmarked user';
 
-export const SaveAll = ({bookmarked, ids}) => {
+export const SaveAll = ({bookmarked, ids, loading}) => {
   return {
     type: SAVE_ALL,
     bookmarked,
     ids,
+    loading,
   };
 };
 

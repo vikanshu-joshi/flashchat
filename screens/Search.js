@@ -9,7 +9,6 @@ import {AddBookmark, RemoveBookmark} from '../redux/action/BookmarkedActions';
 
 const Search = () => {
   const bookmarks = useSelector(state => state.bookmarkedState);
-  console.log(bookmarks);
   const dispatch = useDispatch();
   const [state, setstate] = useState({
     loading: false,

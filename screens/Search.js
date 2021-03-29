@@ -1,11 +1,16 @@
 import React, {useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {Text, ProgressBar} from 'react-native-paper';
+import {useDispatch, useSelector} from 'react-redux';
 import SearchBar from '../components/SearchBar';
 import UserTile from '../components/UserTile';
 import firebase from '../config/firebase';
+import {AddBookmark, RemoveBookmark} from '../redux/action/BookmarkedActions';
 
 const Search = () => {
+  const bookmarks = useSelector(state => state.bookmarkedState);
+  console.log(bookmarks);
+  const dispatch = useDispatch();
   const [state, setstate] = useState({
     loading: false,
     users: [],
@@ -65,6 +70,7 @@ const Search = () => {
               <UserTile
                 {...item}
                 darkMode={false}
+                isSaved={bookmarks.ids.includes(item.id)}
                 onUserSelected={({id, photoURL, displayName}) => {}}
                 onUserBookmarked={({id, photoURL, displayName, isSaved}) => {
                   if (isSaved) {
@@ -75,6 +81,7 @@ const Search = () => {
                       .collection('bookmarked')
                       .doc(id)
                       .delete();
+                    dispatch(RemoveBookmark({id: id}));
                   } else {
                     firebase
                       .firestore()
@@ -88,6 +95,7 @@ const Search = () => {
                         displayName,
                         timestamp: firebase.firestore.Timestamp.now(),
                       });
+                    dispatch(AddBookmark({id, photoURL, displayName}));
                   }
                 }}
               />

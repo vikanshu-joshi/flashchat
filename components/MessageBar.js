@@ -9,35 +9,32 @@ const MessageBar = ({id}) => {
   });
   const onMessageSend = () => {
     console.log(id);
+    const timestamp = firebase.firestore.Timestamp.now();
     const messageData = {
       text: state.message,
-      timestamp: firebase.firestore.Timestamp.now(),
+      timestamp,
       from: firebase.auth().currentUser.uid,
-      read: false,
-      type: 'message',
     };
     firebase
       .firestore()
       .collection('users')
       .doc(id)
       .collection('live')
-      .add(messageData);
+      .add({...messageData, type: 'message'});
     firebase
       .firestore()
       .collection('users')
       .doc(firebase.auth().currentUser.uid)
       .collection('chats')
       .doc(id)
-      .collection('messages')
-      .add(messageData);
+      .set(messageData);
     firebase
       .firestore()
       .collection('users')
       .doc(id)
       .collection('chats')
       .doc(firebase.auth().currentUser.uid)
-      .collection('messages')
-      .add(messageData);
+      .set(messageData);
     setstate({...state, message: ''});
   };
   return (

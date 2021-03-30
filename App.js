@@ -14,9 +14,11 @@ import {createStore, applyMiddleware, combineReducers} from 'redux';
 import thunk from 'redux-thunk';
 import AuthNavigator from './navigator/AuthNavigator';
 import {BookmarkedReducer} from './redux/reducer/BookmarkedReducer';
+import {ChatsReducer} from './redux/reducer/ChatsReducer';
 
 const rootReducer = combineReducers({
   bookmarkedState: BookmarkedReducer,
+  chatsState: ChatsReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));

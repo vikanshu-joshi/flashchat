@@ -5,10 +5,12 @@ import Chats from '../screens/Chats';
 import React, {useEffect} from 'react';
 import {Badge, Text} from 'react-native-paper';
 import {View} from 'react-native';
+import {useSelector} from 'react-redux';
 
 const Tab = createMaterialTopTabNavigator();
 
 function TabNavigator({navigation}) {
+  const chatsState = useSelector(state => state.chatsState);
   return (
     <Tab.Navigator
       initialRouteName={RouteNames.CHAT_SCREEN}
@@ -18,10 +20,19 @@ function TabNavigator({navigation}) {
         component={Chats}
         options={{
           tabBarLabel: ({color, focused}) => {
+            let count = 0;
+            for (
+              let index = 0;
+              index < Object.keys(chatsState.unreadCount).length;
+              index++
+            ) {
+              const element = Object.keys(chatsState.unreadCount)[index];
+              count += chatsState.unreadCount[element];
+            }
             return (
               <View style={{flexDirection: 'row'}}>
                 <Text style={{marginEnd: 8, color: color}}>Chats</Text>
-                <Badge>3</Badge>
+                {count !== 0 && <Badge>{count}</Badge>}
               </View>
             );
           },

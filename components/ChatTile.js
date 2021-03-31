@@ -1,9 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import {Avatar, Badge, Text} from 'react-native-paper';
 import firebase from '../config/firebase';
 
-function ChatTile({from, messageId, text, timestamp, unreadCount}) {
+function ChatTile({
+  from,
+  messageId,
+  text,
+  timestamp,
+  unreadCount,
+  onChatOpened,
+}) {
   const [state, setstate] = useState({
     displayName: '...',
     photoURL: 'default',
@@ -16,7 +23,6 @@ function ChatTile({from, messageId, text, timestamp, unreadCount}) {
       .get()
       .then(snapshot => {
         const data = snapshot.data();
-        console.log(data);
         setstate({
           displayName: data.displayName,
           photoURL: data.photoURL,
@@ -24,51 +30,61 @@ function ChatTile({from, messageId, text, timestamp, unreadCount}) {
       });
   }, [from]);
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: 'row',
-        padding: 8,
-        alignItems: 'center',
-      }}>
-      {state.photoURL === 'default' ? (
-        <Avatar.Text label={state.displayName.substr(0, 1)} />
-      ) : (
-        <Avatar.Image>{state.photoURL}</Avatar.Image>
-      )}
+    <TouchableOpacity
+      onPress={e =>
+        onChatOpened({
+          id: from,
+          displayName: state.displayName,
+          photoURL: state.photoURL,
+        })
+      }>
       <View
         style={{
           flex: 1,
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          height: '70%',
-          marginHorizontal: 16,
+          flexDirection: 'row',
+          padding: 8,
+          alignItems: 'center',
+          width: '100%',
         }}>
-        <Text
+        {state.photoURL === 'default' ? (
+          <Avatar.Text label={state.displayName.substr(0, 1)} />
+        ) : (
+          <Avatar.Image>{state.photoURL}</Avatar.Image>
+        )}
+        <View
           style={{
-            fontFamily: 'Montserrat-SemiBold',
-            fontSize: 16,
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '70%',
+            marginHorizontal: 16,
           }}>
-          {state.displayName}
-        </Text>
-        <Text
+          <Text
+            style={{
+              fontFamily: 'Montserrat-SemiBold',
+              fontSize: 16,
+            }}>
+            {state.displayName}
+          </Text>
+          <Text
+            style={{
+              fontFamily: 'Montserrat-Regular',
+              fontSize: 16,
+            }}>
+            {from === firebase.auth().currentUser.uid ? 'You: ' + text : text}
+          </Text>
+        </View>
+        <View
           style={{
-            fontFamily: 'Montserrat-Regular',
-            fontSize: 16,
+            flexDirection: 'column',
+            justifyContent: unreadCount !== 0 ? 'space-between' : 'center',
+            height: '70%',
           }}>
-          {text}
-        </Text>
+          {unreadCount !== 0 && <Badge>{unreadCount}</Badge>}
+          <Text>{timestamp.toDate().toLocaleDateString()}</Text>
+        </View>
       </View>
-      <View
-        style={{
-          flexDirection: 'column',
-          justifyContent: unreadCount !== 0 ? 'space-between' : 'center',
-          height: '70%',
-        }}>
-        {unreadCount !== 0 && <Badge>{unreadCount}</Badge>}
-        <Text>{timestamp.toDate().toLocaleDateString()}</Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

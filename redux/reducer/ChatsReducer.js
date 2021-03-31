@@ -4,7 +4,7 @@ import firebase from '../../config/firebase';
 const initialState = {
   chats: {},
   ids: [],
-  unreadCount: 0,
+  unreadCount: {},
   loading: false,
 };
 
@@ -22,6 +22,9 @@ export const fetchAsync = () => {
         newState.ids.push(doc.id);
         newState.chats[doc.id] = [];
       });
+      if (snapshot.size === 0) {
+        dispatch(ChatActions.LoadingChats({loading: false}));
+      }
       for (let index = 0; index < newState.ids.length; index++) {
         const element = newState.ids[index];
         ref
@@ -32,6 +35,16 @@ export const fetchAsync = () => {
           .then(data => {
             data.docs.forEach(message => {
               const messageData = message.data();
+              console.log(messageData, firebase.auth().currentUser.uid);
+              if (
+                !messageData.read &&
+                messageData.from !== firebase.auth().currentUser.uid
+              ) {
+                newState.unreadCount[messageData.from]
+                  ? (newState.unreadCount[messageData.from] =
+                      newState.unreadCount[messageData.from] + 1)
+                  : (newState.unreadCount[messageData.from] = 0);
+              }
               newState.chats[element].push({
                 ...messageData,
                 messageId: message.id,
@@ -82,7 +95,7 @@ export const ChatsReducer = (state = initialState, action) => {
     } else {
       return {
         ...state,
-        unreadCount: state.unreadCount + 1,
+        // unreadCount: state.unreadCount + 1,
         chats: {
           ...state.chats,
           [action.id]: [

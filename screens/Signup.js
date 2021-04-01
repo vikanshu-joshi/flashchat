@@ -31,6 +31,10 @@ const Signup = () => {
         .createUserWithEmailAndPassword(state.email, state.password)
         .then(result => {
           if (result.user) {
+            firebase.auth().currentUser.updateProfile({
+              displayName: state.name,
+              photoURL: 'default',
+            });
             firebase.firestore().collection('users').doc(result.user.uid).set({
               displayName: state.name,
               email: state.email,

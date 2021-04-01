@@ -15,9 +15,12 @@ import {IconButton, Text} from 'react-native-paper';
 import {Image, TouchableOpacity, View} from 'react-native';
 import logo from '../assets/images/logo.png';
 import firebase from '../config/firebase';
+import {useDispatch} from 'react-redux';
+import * as ChatActions from '../redux/action/ChatsActions';
 
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   return (
     <DrawerContentScrollView {...props}>
       <View
@@ -46,6 +49,16 @@ function CustomDrawerContent(props) {
       <DrawerItemList {...props} />
       <TouchableOpacity
         onPress={e => {
+          dispatch(
+            ChatActions.ChangeState({
+              state: {
+                chats: {},
+                ids: [],
+                unreadCount: {},
+                loading: false,
+              },
+            }),
+          );
           firebase.auth().signOut();
         }}
         style={{

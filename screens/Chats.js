@@ -26,22 +26,17 @@ const Chats = ({route}) => {
           renderItem={({item}) => {
             return (
               <ChatTile
-                from={
-                  chatState.chats[item][chatState.chats[item].length - 1].from
-                }
-                text={
-                  chatState.chats[item][chatState.chats[item].length - 1].text
-                }
-                timestamp={
-                  chatState.chats[item][chatState.chats[item].length - 1]
-                    .timestamp
-                }
+                from={chatState.chats[item].id}
+                text={chatState.chats[item].text}
+                timestamp={chatState.chats[item].timestamp}
                 unreadCount={
-                  chatState.unreadCount[item] ? chatState.unreadCount[item] : 0
+                  chatState.chats[item].unreadCount
+                    ? chatState.chats[item].unreadCount
+                    : 0
                 }
                 onChatOpened={({photoURL, displayName}) =>
                   navigation.navigate(MESSAGES_SCREEN, {
-                    id: item,
+                    id: chatState.chats[item].id,
                     photoURL,
                     displayName,
                   })

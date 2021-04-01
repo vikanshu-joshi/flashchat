@@ -5,94 +5,93 @@ import {Colors, Text} from 'react-native-paper';
 import moment from 'moment';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-function MessageTile({from, messageId, text, timestamp, read, id}) {
+function MessageTile({message}) {
   const [state, setState] = useState({
-    from: from,
-    messageId: messageId,
-    text: text,
-    read: read,
-    timestamp: timestamp,
+    ...message,
   });
-  useEffect(() => {
-    let unsubscribe = null;
-    if (from === id) {
-      firebase
-        .firestore()
-        .collection('users')
-        .doc(id)
-        .collection('chats')
-        .doc(firebase.auth().currentUser.uid)
-        .update({
-          read: true,
-        });
-      firebase
-        .firestore()
-        .collection('users')
-        .doc(id)
-        .collection('chats')
-        .doc(firebase.auth().currentUser.uid)
-        .collection('messages')
-        .doc(messageId)
-        .update({read: true});
-      firebase
-        .firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .collection('chats')
-        .doc(id)
-        .update({
-          read: true,
-        });
-      firebase
-        .firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .collection('chats')
-        .doc(id)
-        .collection('messages')
-        .doc(messageId)
-        .update({read: true});
-    } else {
-      unsubscribe = firebase
-        .firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .collection('chats')
-        .doc(id)
-        .collection('messages')
-        .doc(messageId)
-        .onSnapshot(doc => {
-          const data = doc.data();
-          setState({
-            from: data.from,
-            messageId: data.messageId,
-            text: data.text,
-            read: data.read,
-            timestamp: data.timestamp,
-          });
-        });
-    }
-    return () => {
-      unsubscribe !== null && unsubscribe();
-    };
-  }, [from]);
+  console.log(state);
+  // useEffect(() => {
+  //   let unsubscribe = null;
+  //   if (message.from === message.id) {
+  //     firebase
+  //       .firestore()
+  //       .collection('users')
+  //       .doc(id)
+  //       .collection('chats')
+  //       .doc(firebase.auth().currentUser.uid)
+  //       .update({
+  //         read: true,
+  //       });
+  //     firebase
+  //       .firestore()
+  //       .collection('users')
+  //       .doc(id)
+  //       .collection('chats')
+  //       .doc(firebase.auth().currentUser.uid)
+  //       .collection('messages')
+  //       .doc(messageId)
+  //       .update({read: true});
+  //     firebase
+  //       .firestore()
+  //       .collection('users')
+  //       .doc(firebase.auth().currentUser.uid)
+  //       .collection('chats')
+  //       .doc(id)
+  //       .update({
+  //         read: true,
+  //       });
+  //     firebase
+  //       .firestore()
+  //       .collection('users')
+  //       .doc(firebase.auth().currentUser.uid)
+  //       .collection('chats')
+  //       .doc(id)
+  //       .collection('messages')
+  //       .doc(messageId)
+  //       .update({read: true});
+  //   } else {
+  //     unsubscribe = firebase
+  //       .firestore()
+  //       .collection('users')
+  //       .doc(firebase.auth().currentUser.uid)
+  //       .collection('chats')
+  //       .doc(id)
+  //       .collection('messages')
+  //       .doc(messageId)
+  //       .onSnapshot(doc => {
+  //         const data = doc.data();
+  //         setState({
+  //           from: data.from,
+  //           messageId: data.messageId,
+  //           text: data.text,
+  //           read: data.read,
+  //           timestamp: data.timestamp,
+  //         });
+  //       });
+  //   }
+  //   return () => {
+  //     unsubscribe !== null && unsubscribe();
+  //   };
+  // }, [message]);
   return (
     <View
       style={{
         flex: 1,
         flexDirection: 'row',
         justifyContent:
-          from === firebase.auth().currentUser.uid ? 'flex-end' : 'flex-start',
+          message.from === firebase.auth().currentUser.uid
+            ? 'flex-end'
+            : 'flex-start',
       }}>
       <View
         style={
-          from === firebase.auth().currentUser.uid
+          message.from === firebase.auth().currentUser.uid
             ? styles.messageTextHolderMine
             : styles.messageTextHolderUser
         }>
         <Text
           style={
-            from === firebase.auth().currentUser.uid
+            message.from === firebase.auth().currentUser.uid
               ? styles.messageText
               : styles.messageText
           }>
@@ -105,7 +104,7 @@ function MessageTile({from, messageId, text, timestamp, read, id}) {
           }}>
           <Text
             style={
-              from === firebase.auth().currentUser.uid
+              message.from === firebase.auth().currentUser.uid
                 ? styles.messageTime
                 : styles.messageTime
             }>
@@ -113,7 +112,7 @@ function MessageTile({from, messageId, text, timestamp, read, id}) {
               'hh:mm a',
             )}
           </Text>
-          {from === firebase.auth().currentUser.uid && (
+          {message.from === firebase.auth().currentUser.uid && (
             <Ionicons
               name={state.read ? 'checkmark-done' : 'checkmark'}
               color={Colors.grey400}

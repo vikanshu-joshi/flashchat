@@ -1,57 +1,141 @@
 import {useNavigation} from '@react-navigation/core';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {Colors, IconButton, Text} from 'react-native-paper';
 import {useSelector} from 'react-redux';
 import MessageBar from '../components/MessageBar';
 import MessageTile from '../components/MessageTile';
+import firebase from '../config/firebase';
 
 const Messages = ({route}) => {
   const navigation = useNavigation();
-  const chatsState = useSelector(
-    state => state.chatsState.chats[route.params.id],
-  );
+  const [state, setstate] = useState({
+    messages: {},
+    messageIds: [],
+    loading: false,
+    roomId:
+      route.params.id > firebase.auth().currentUser.uid
+        ? route.params.id + '--' + firebase.auth().currentUser.uid
+        : firebase.auth().currentUser.uid + '--' + route.params.id,
+  });
   useEffect(() => {
-    setTimeout(() => {
-      flatListRef !== null && flatListRef.current.scrollToEnd({animated: true});
-    }, 500);
-  }, [chatsState]);
+    if (state.roomId === undefined) {
+      setstate({
+        ...state,
+        loading: true,
+      });
+    } else {
+      setstate({
+        ...state,
+        loading: true,
+      });
+    }
+    const unsubscribe = firebase
+      .firestore()
+      .collection('rooms')
+      .doc(state.roomId)
+      .collection('messages')
+      .onSnapshot(snapshot => {
+        const fetchedMessages = state.messages;
+        const fetchedMessageIds = state.messageIds;
+        console.log(snapshot.size, route.params.id, state.roomId);
+        snapshot.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const data = change.doc.data();
+            fetchedMessageIds.push(data.messageId);
+            fetchedMessages[data.messageId] = data;
+          }
+          if (change.type === 'modified') {
+            const data = change.doc.data();
+            fetchedMessages[data.messageId] = data;
+          }
+          if (change.type === 'removed') {
+            const data = change.doc.data();
+            fetchedMessageIds.filter(item => item !== data.messageId);
+            delete fetchedMessages[data.messageId];
+          }
+        });
+        setstate({
+          ...state,
+          loading: false,
+          messageIds: fetchedMessageIds,
+          messages: fetchedMessages,
+        });
+        // setTimeout(() => {
+        //   flatListRef !== null &&
+        //     flatListRef.current.scrollToEnd({animated: true});
+        // }, 500);
+      });
+    return () => {
+      unsubscribe();
+    };
+  }, [route.params.id]);
   const flatListRef = useRef(null);
   return (
     <View style={{flex: 1}}>
-      <View style={{flex: 1, paddingTop: 8}}>
-        <FlatList
-          ref={flatListRef}
-          data={chatsState ? chatsState : []}
-          keyExtractor={item => item.messageId}
-          renderItem={({item}) => (
-            <MessageTile
-              from={item.from}
-              messageId={item.messageId}
-              text={item.text}
-              timestamp={item.timestamp}
-              read={item.read}
-              id={route.params.id}
-            />
-          )}
-        />
-        <IconButton
-          style={{
-            backgroundColor: Colors.grey400,
-            position: 'absolute',
-            bottom: 10,
-            right: 10,
-          }}
-          icon="chevron-down"
-          onPress={e => {
-            flatListRef != null &&
-              flatListRef.current.scrollToEnd({animated: true});
-          }}
-        />
+      <View
+        style={{
+          flex: 1,
+          paddingVertical: 8,
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+        }}>
+        {state.loading ? (
+          <Text
+            style={{
+              fontFamily: 'Montserrat-Bold',
+              fontSize: 32,
+            }}>
+            Loading...
+          </Text>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            style={{
+              width: '100%',
+            }}
+            data={state.messageIds}
+            keyExtractor={item => item.toString()}
+            renderItem={({item}) => (
+              <MessageTile message={state.messages[item]} />
+            )}
+          />
+        )}
+        {!state.loading && (
+          <IconButton
+            style={{
+              backgroundColor: Colors.grey400,
+              position: 'absolute',
+              bottom: 10,
+              right: 10,
+            }}
+            icon="chevron-down"
+            onPress={e => {
+              flatListRef != null &&
+                flatListRef.current.scrollToEnd({animated: true});
+            }}
+          />
+        )}
       </View>
-      <MessageBar id={route.params.id} flatListRef={flatListRef} />
+      <MessageBar
+        id={route.params.id}
+        flatListRef={flatListRef}
+        roomId={state.roomId}
+      />
     </View>
   );
 };
+
+function makeid(length) {
+  var result = '';
+  var characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 
 export default Messages;

@@ -3,7 +3,7 @@ import {TextInput, View} from 'react-native';
 import {Colors, IconButton} from 'react-native-paper';
 import firebase from '../config/firebase';
 
-const MessageBar = ({id, flatListRef}) => {
+const MessageBar = ({id, flatListRef, roomId}) => {
   const [state, setstate] = useState({
     message: '',
   });
@@ -12,21 +12,20 @@ const MessageBar = ({id, flatListRef}) => {
     const timestamp = firebase.firestore.Timestamp.now();
     const messageId = makeid(20);
     const messageData = {
+      messageId: messageId,
       text: state.message,
       timestamp,
       from: firebase.auth().currentUser.uid,
-      messageId: messageId,
       read: false,
+      hasMedia: false,
+      mediaLink: 'null',
+      mime: 'null',
+      edited: false,
+      roomId: roomId,
     };
     firebase
       .firestore()
       .collection('users')
-      .doc(id)
-      .collection('live')
-      .add({...messageData, type: 'message'});
-    firebase
-      .firestore()
-      .collection('users')
       .doc(firebase.auth().currentUser.uid)
       .collection('chats')
       .doc(id)
@@ -40,19 +39,8 @@ const MessageBar = ({id, flatListRef}) => {
       .set(messageData);
     firebase
       .firestore()
-      .collection('users')
-      .doc(firebase.auth().currentUser.uid)
-      .collection('chats')
-      .doc(id)
-      .collection('messages')
-      .doc(messageId)
-      .set(messageData);
-    firebase
-      .firestore()
-      .collection('users')
-      .doc(id)
-      .collection('chats')
-      .doc(firebase.auth().currentUser.uid)
+      .collection('rooms')
+      .doc(roomId)
       .collection('messages')
       .doc(messageId)
       .set(messageData);

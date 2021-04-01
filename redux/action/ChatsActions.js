@@ -18,33 +18,17 @@ export const ChangeState = ({state}) => {
   };
 };
 
-export const NewIncomingMessage = ({
-  id,
-  text,
-  timestamp,
-  from,
-  read,
-  messageId,
-}) => {
+export const NewIncomingMessage = ({messageData}) => {
   return {
     type: NEW_MESSAGE,
-    id,
-    text,
-    timestamp,
-    from,
-    read,
-    messageId,
+    messageData,
   };
 };
 
-export const SendMessage = ({id, text, timestamp, from, read}) => {
+export const SendMessage = ({messageData}) => {
   return {
     type: SEND_MESSAGE,
-    id,
-    text,
-    timestamp,
-    from,
-    read,
+    messageData,
   };
 };
 

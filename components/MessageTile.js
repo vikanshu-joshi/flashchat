@@ -5,74 +5,52 @@ import {Colors, Text} from 'react-native-paper';
 import moment from 'moment';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-function MessageTile({message}) {
+function MessageTile({message, roomId, id}) {
   const [state, setState] = useState({
     ...message,
   });
-  console.log(state);
-  // useEffect(() => {
-  //   let unsubscribe = null;
-  //   if (message.from === message.id) {
-  //     firebase
-  //       .firestore()
-  //       .collection('users')
-  //       .doc(id)
-  //       .collection('chats')
-  //       .doc(firebase.auth().currentUser.uid)
-  //       .update({
-  //         read: true,
-  //       });
-  //     firebase
-  //       .firestore()
-  //       .collection('users')
-  //       .doc(id)
-  //       .collection('chats')
-  //       .doc(firebase.auth().currentUser.uid)
-  //       .collection('messages')
-  //       .doc(messageId)
-  //       .update({read: true});
-  //     firebase
-  //       .firestore()
-  //       .collection('users')
-  //       .doc(firebase.auth().currentUser.uid)
-  //       .collection('chats')
-  //       .doc(id)
-  //       .update({
-  //         read: true,
-  //       });
-  //     firebase
-  //       .firestore()
-  //       .collection('users')
-  //       .doc(firebase.auth().currentUser.uid)
-  //       .collection('chats')
-  //       .doc(id)
-  //       .collection('messages')
-  //       .doc(messageId)
-  //       .update({read: true});
-  //   } else {
-  //     unsubscribe = firebase
-  //       .firestore()
-  //       .collection('users')
-  //       .doc(firebase.auth().currentUser.uid)
-  //       .collection('chats')
-  //       .doc(id)
-  //       .collection('messages')
-  //       .doc(messageId)
-  //       .onSnapshot(doc => {
-  //         const data = doc.data();
-  //         setState({
-  //           from: data.from,
-  //           messageId: data.messageId,
-  //           text: data.text,
-  //           read: data.read,
-  //           timestamp: data.timestamp,
-  //         });
-  //       });
-  //   }
-  //   return () => {
-  //     unsubscribe !== null && unsubscribe();
-  //   };
-  // }, [message]);
+  useEffect(() => {
+    let unsubscribe = null;
+    if (message.from.toString() !== firebase.auth().currentUser.uid.toString()) {
+      if(!state.read){
+        firebase
+        .firestore()
+        .collection('rooms')
+        .doc(roomId)
+        .collection('messages')
+        .doc(message.messageId)
+        .update({
+          read: true,
+        });
+      firebase
+        .firestore()
+        .collection('users')
+        .doc(firebase.auth().currentUser.uid)
+        .collection('chats')
+        .doc(id)
+        .update({
+          unreadCount: firebase.firestore.FieldValue.increment(-1),
+        });
+      }
+    } else {
+      unsubscribe = firebase
+        .firestore()
+        .collection('rooms')
+        .doc(roomId)
+        .collection('messages')
+        .doc(message.messageId)
+        .onSnapshot(doc => {
+          const data = doc.data();
+          setState({
+            ...state,
+            ...data
+          });
+        });
+    }
+    return () => {
+      unsubscribe !== null && unsubscribe();
+    };
+  }, [message]);
   return (
     <View
       style={{

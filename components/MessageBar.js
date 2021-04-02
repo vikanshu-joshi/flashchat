@@ -3,7 +3,7 @@ import {TextInput, View} from 'react-native';
 import {Colors, IconButton} from 'react-native-paper';
 import firebase from '../config/firebase';
 
-const MessageBar = ({id, flatListRef, roomId}) => {
+const MessageBar = ({id, flatListRef, roomId, messagesCount}) => {
   const [state, setstate] = useState({
     message: '',
   });
@@ -36,7 +36,7 @@ const MessageBar = ({id, flatListRef, roomId}) => {
       .doc(id)
       .collection('chats')
       .doc(firebase.auth().currentUser.uid)
-      .set(messageData);
+      .set({...messageData, unreadCount: messagesCount === 0 ? 1 : firebase.firestore.FieldValue.increment(1)});
     firebase
       .firestore()
       .collection('rooms')

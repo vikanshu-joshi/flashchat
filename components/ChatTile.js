@@ -7,6 +7,7 @@ function ChatTile({
   from,
   messageId,
   text,
+  sender,
   timestamp,
   unreadCount,
   onChatOpened,
@@ -19,7 +20,7 @@ function ChatTile({
     firebase
       .firestore()
       .collection('users')
-      .doc(from)
+      .doc(sender)
       .get()
       .then(snapshot => {
         const data = snapshot.data();
@@ -28,7 +29,7 @@ function ChatTile({
           photoURL: data.photoURL,
         });
       });
-  }, [from]);
+  }, [sender]);
   return (
     <TouchableOpacity
       onPress={e =>

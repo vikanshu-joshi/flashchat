@@ -26,7 +26,8 @@ const Chats = ({route}) => {
           renderItem={({item}) => {
             return (
               <ChatTile
-                from={chatState.chats[item].id}
+                from={chatState.chats[item].from}
+                sender={chatState.chats[item].id}
                 text={chatState.chats[item].text}
                 timestamp={chatState.chats[item].timestamp}
                 unreadCount={

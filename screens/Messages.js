@@ -19,26 +19,19 @@ const Messages = ({route}) => {
         : firebase.auth().currentUser.uid + '--' + route.params.id,
   });
   useEffect(() => {
-    if (state.roomId === undefined) {
-      setstate({
-        ...state,
-        loading: true,
-      });
-    } else {
-      setstate({
-        ...state,
-        loading: true,
-      });
-    }
+    setstate({
+      ...state,
+      loading: true,
+    });
     const unsubscribe = firebase
       .firestore()
       .collection('rooms')
       .doc(state.roomId)
       .collection('messages')
+      .orderBy("timestamp")
       .onSnapshot(snapshot => {
         const fetchedMessages = state.messages;
         const fetchedMessageIds = state.messageIds;
-        console.log(snapshot.size, route.params.id, state.roomId);
         snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             const data = change.doc.data();
@@ -46,7 +39,7 @@ const Messages = ({route}) => {
             fetchedMessages[data.messageId] = data;
           }
           if (change.type === 'modified') {
-            const data = change.doc.data();
+            const data = change.doc.data();s
             fetchedMessages[data.messageId] = data;
           }
           if (change.type === 'removed') {
@@ -61,10 +54,10 @@ const Messages = ({route}) => {
           messageIds: fetchedMessageIds,
           messages: fetchedMessages,
         });
-        // setTimeout(() => {
-        //   flatListRef !== null &&
-        //     flatListRef.current.scrollToEnd({animated: true});
-        // }, 500);
+        setTimeout(() => {
+          flatListRef !== null &&
+            flatListRef.current.scrollToEnd({animated: true});
+        }, 500);
       });
     return () => {
       unsubscribe();
@@ -98,7 +91,7 @@ const Messages = ({route}) => {
             data={state.messageIds}
             keyExtractor={item => item.toString()}
             renderItem={({item}) => (
-              <MessageTile message={state.messages[item]} />
+              <MessageTile message={state.messages[item]} roomId={state.roomId} id={route.params.id}/>
             )}
           />
         )}
@@ -122,6 +115,7 @@ const Messages = ({route}) => {
         id={route.params.id}
         flatListRef={flatListRef}
         roomId={state.roomId}
+        messagesCount={state.messageIds.length}
       />
     </View>
   );

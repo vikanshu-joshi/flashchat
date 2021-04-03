@@ -24,15 +24,6 @@ function MessageTile({message, roomId, id}) {
           .update({
             read: true,
           });
-        firebase
-          .firestore()
-          .collection('users')
-          .doc(firebase.auth().currentUser.uid)
-          .collection('chats')
-          .doc(id)
-          .update({
-            unreadCount: firebase.firestore.FieldValue.increment(-1),
-          });
       }
     } else {
       unsubscribe = firebase
@@ -94,7 +85,7 @@ function MessageTile({message, roomId, id}) {
           {message.from === firebase.auth().currentUser.uid && (
             <Ionicons
               name={state.read ? 'checkmark-done' : 'checkmark'}
-              color={Colors.grey400}
+              color="white"
               style={{alignSelf: 'flex-end', marginStart: 4}}
             />
           )}

@@ -27,7 +27,7 @@ function TabNavigator({navigation}) {
               index++
             ) {
               const element = Object.keys(chatsState.unreadCount)[index];
-              count += (chatsState.unreadCount[element] ? chatsState.unreadCount[element] : 0);
+              count += chatsState.unreadCount[element] ? 1 : 0;
             }
             return (
               <View style={{flexDirection: 'row'}}>

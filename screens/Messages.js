@@ -30,6 +30,15 @@ const Messages = ({route}) => {
       .collection('messages')
       .orderBy('timestamp')
       .onSnapshot(snapshot => {
+        firebase
+          .firestore()
+          .collection('users')
+          .doc(firebase.auth().currentUser.uid)
+          .collection('chats')
+          .doc(route.params.id)
+          .update({
+            unreadCount: 0,
+          });
         const fetchedMessages = state.messages;
         const fetchedMessageIds = state.messageIds;
         snapshot.docChanges().forEach(change => {

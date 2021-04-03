@@ -29,23 +29,6 @@ const MessageBar = ({id, flatListRef, roomId}) => {
     };
     firebase
       .firestore()
-      .collection('rooms')
-      .doc(roomId)
-      .collection('messages')
-      .doc(messageId)
-      .set({...lastMessage});
-    firebase
-      .firestore()
-      .collection('users')
-      .doc(firebase.auth().currentUser.uid)
-      .collection('chats')
-      .doc(id)
-      .set({
-        ...messageData,
-        uid: id,
-      });
-    firebase
-      .firestore()
       .collection('users')
       .doc(id)
       .collection('chats')
@@ -58,6 +41,23 @@ const MessageBar = ({id, flatListRef, roomId}) => {
         },
         {merge: true},
       );
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(firebase.auth().currentUser.uid)
+      .collection('chats')
+      .doc(id)
+      .set({
+        ...messageData,
+        uid: id,
+      });
+    firebase
+      .firestore()
+      .collection('rooms')
+      .doc(roomId)
+      .collection('messages')
+      .doc(messageId)
+      .set({...lastMessage});
     setstate({...state, message: ''});
   };
   return (

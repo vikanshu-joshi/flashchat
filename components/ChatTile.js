@@ -69,22 +69,51 @@ function ChatTile({
             }}>
             {state.displayName}
           </Text>
-          <Text
-            style={{
-              fontFamily: 'Montserrat-Regular',
-              fontSize: 16,
-            }}>
-            {from === firebase.auth().currentUser.uid ? (
-              'You: ' + text
-            ) : lastMessage.hasMedia ? (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <FontAwesome name="image" />
-                <Text style={{marginStart: 8}}>{text}</Text>
-              </View>
-            ) : (
-              text
-            )}
-          </Text>
+          {from === firebase.auth().currentUser.uid ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  marginEnd: 8,
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 16,
+                }}>
+                You:
+              </Text>
+              {lastMessage.hasMedia ? (
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <FontAwesome name="image" />
+                  <Text
+                    style={{
+                      marginStart: 5,
+                      fontFamily: 'Montserrat-Regular',
+                      fontSize: 16,
+                    }}>
+                    {text}
+                  </Text>
+                </View>
+              ) : (
+                text
+              )}
+            </View>
+          ) : lastMessage.hasMedia ? (
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <FontAwesome name="image" />
+              <Text
+                style={{
+                  marginStart: 5,
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 16,
+                }}>
+                {text}
+              </Text>
+            </View>
+          ) : (
+            text
+          )}
         </View>
         <View
           style={{

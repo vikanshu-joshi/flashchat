@@ -98,6 +98,10 @@ const Messages = ({route}) => {
             style={{
               width: '100%',
             }}
+            onContentSizeChange={() => {
+              flatListRef !== null &&
+                flatListRef.current.scrollToEnd({animated: true});
+            }}
             data={state.messageIds}
             keyExtractor={item => item.toString()}
             renderItem={({item}) => (

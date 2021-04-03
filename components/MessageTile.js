@@ -11,26 +11,28 @@ function MessageTile({message, roomId, id}) {
   });
   useEffect(() => {
     let unsubscribe = null;
-    if (message.from.toString() !== firebase.auth().currentUser.uid.toString()) {
-      if(!state.read){
+    if (
+      message.from.toString() !== firebase.auth().currentUser.uid.toString()
+    ) {
+      if (!state.read) {
         firebase
-        .firestore()
-        .collection('rooms')
-        .doc(roomId)
-        .collection('messages')
-        .doc(message.messageId)
-        .update({
-          read: true,
-        });
-      firebase
-        .firestore()
-        .collection('users')
-        .doc(firebase.auth().currentUser.uid)
-        .collection('chats')
-        .doc(id)
-        .update({
-          unreadCount: firebase.firestore.FieldValue.increment(-1),
-        });
+          .firestore()
+          .collection('rooms')
+          .doc(roomId)
+          .collection('messages')
+          .doc(message.messageId)
+          .update({
+            read: true,
+          });
+        firebase
+          .firestore()
+          .collection('users')
+          .doc(firebase.auth().currentUser.uid)
+          .collection('chats')
+          .doc(id)
+          .update({
+            unreadCount: firebase.firestore.FieldValue.increment(-1),
+          });
       }
     } else {
       unsubscribe = firebase
@@ -42,8 +44,7 @@ function MessageTile({message, roomId, id}) {
         .onSnapshot(doc => {
           const data = doc.data();
           setState({
-            ...state,
-            ...data
+            ...data,
           });
         });
     }

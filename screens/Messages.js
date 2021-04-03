@@ -28,18 +28,19 @@ const Messages = ({route}) => {
       .collection('rooms')
       .doc(state.roomId)
       .collection('messages')
-      .orderBy("timestamp")
+      .orderBy('timestamp')
       .onSnapshot(snapshot => {
         const fetchedMessages = state.messages;
         const fetchedMessageIds = state.messageIds;
         snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             const data = change.doc.data();
-            fetchedMessageIds.push(data.messageId);
+            if (!fetchedMessageIds.includes(data.messageId))
+              fetchedMessageIds.push(data.messageId);
             fetchedMessages[data.messageId] = data;
           }
           if (change.type === 'modified') {
-            const data = change.doc.data();s
+            const data = change.doc.data();
             fetchedMessages[data.messageId] = data;
           }
           if (change.type === 'removed') {
@@ -91,7 +92,11 @@ const Messages = ({route}) => {
             data={state.messageIds}
             keyExtractor={item => item.toString()}
             renderItem={({item}) => (
-              <MessageTile message={state.messages[item]} roomId={state.roomId} id={route.params.id}/>
+              <MessageTile
+                message={state.messages[item]}
+                roomId={state.roomId}
+                id={route.params.id}
+              />
             )}
           />
         )}
@@ -115,7 +120,6 @@ const Messages = ({route}) => {
         id={route.params.id}
         flatListRef={flatListRef}
         roomId={state.roomId}
-        messagesCount={state.messageIds.length}
       />
     </View>
   );

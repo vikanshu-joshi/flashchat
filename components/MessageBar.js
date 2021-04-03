@@ -3,7 +3,7 @@ import {TextInput, View} from 'react-native';
 import {Colors, IconButton} from 'react-native-paper';
 import firebase from '../config/firebase';
 
-const MessageBar = ({id, flatListRef, roomId, messagesCount}) => {
+const MessageBar = ({id, flatListRef, roomId}) => {
   const [state, setstate] = useState({
     message: '',
   });
@@ -11,7 +11,7 @@ const MessageBar = ({id, flatListRef, roomId, messagesCount}) => {
     flatListRef.current.scrollToEnd({animated: true});
     const timestamp = firebase.firestore.Timestamp.now();
     const messageId = makeid(20);
-    const messageData = {
+    const lastMessage = {
       messageId: messageId,
       text: state.message,
       timestamp,
@@ -21,29 +21,43 @@ const MessageBar = ({id, flatListRef, roomId, messagesCount}) => {
       mediaLink: 'null',
       mime: 'null',
       edited: false,
-      roomId: roomId,
     };
-    firebase
-      .firestore()
-      .collection('users')
-      .doc(firebase.auth().currentUser.uid)
-      .collection('chats')
-      .doc(id)
-      .set(messageData);
-    firebase
-      .firestore()
-      .collection('users')
-      .doc(id)
-      .collection('chats')
-      .doc(firebase.auth().currentUser.uid)
-      .set({...messageData, unreadCount: messagesCount === 0 ? 1 : firebase.firestore.FieldValue.increment(1)});
+    const messageData = {
+      lastMessage,
+      roomId,
+      timestamp,
+    };
     firebase
       .firestore()
       .collection('rooms')
       .doc(roomId)
       .collection('messages')
       .doc(messageId)
-      .set(messageData);
+      .set({...lastMessage});
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(firebase.auth().currentUser.uid)
+      .collection('chats')
+      .doc(id)
+      .set({
+        ...messageData,
+        uid: id,
+      });
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(id)
+      .collection('chats')
+      .doc(firebase.auth().currentUser.uid)
+      .set(
+        {
+          ...messageData,
+          unreadCount: firebase.firestore.FieldValue.increment(1),
+          uid: firebase.auth().currentUser.uid,
+        },
+        {merge: true},
+      );
     setstate({...state, message: ''});
   };
   return (

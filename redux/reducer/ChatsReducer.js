@@ -25,14 +25,14 @@ export const fetchAsync = () => {
           const data = change.doc.data();
           dispatch(
             ChatActions.NewIncomingMessage({
-              messageData: {...data, id: change.doc.id},
+              messageData: {...data},
             }),
           );
         } else if (change.type === 'modified') {
           const data = change.doc.data();
           dispatch(
             ChatActions.NewIncomingMessage({
-              messageData: {...data, id: change.doc.id},
+              messageData: {...data},
             }),
           );
         } else if (change.type === 'removed') {
@@ -55,14 +55,14 @@ export const ChatsReducer = (state = initialState, action) => {
     };
   } else if (action.type === ChatActions.NEW_MESSAGE) {
     const currentids = state.ids;
-    if (!currentids.includes(action.messageData.from))
-      currentids.push(action.messageData.from);
+    if (!currentids.includes(action.messageData.uid))
+      currentids.push(action.messageData.uid);
     return {
       ...state,
       ids: currentids,
       chats: {
         ...state.chats,
-        [action.messageData.from]: action.messageData,
+        [action.messageData.uid]: action.messageData,
       },
       loading: false,
       unreadCount: {
@@ -70,8 +70,6 @@ export const ChatsReducer = (state = initialState, action) => {
         [action.messageData.id]: action.messageData.unreadCount,
       },
     };
-  } else if (action.type === ChatActions.SEND_MESSAGE) {
-  } else if (action.type === ChatActions.READ_MESSAGE) {
   }
   return state;
 };

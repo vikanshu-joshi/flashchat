@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {Avatar, Badge, Text} from 'react-native-paper';
 import firebase from '../config/firebase';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 function ChatTile({
   from,
@@ -10,6 +11,7 @@ function ChatTile({
   sender,
   timestamp,
   unreadCount,
+  lastMessage,
   onChatOpened,
 }) {
   const [state, setstate] = useState({
@@ -72,7 +74,16 @@ function ChatTile({
               fontFamily: 'Montserrat-Regular',
               fontSize: 16,
             }}>
-            {from === firebase.auth().currentUser.uid ? 'You: ' + text : text}
+            {from === firebase.auth().currentUser.uid ? (
+              'You: ' + text
+            ) : lastMessage.hasMedia ? (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <FontAwesome name="image" />
+                <Text style={{marginStart: 8}}>{text}</Text>
+              </View>
+            ) : (
+              text
+            )}
           </Text>
         </View>
         <View

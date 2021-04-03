@@ -30,6 +30,7 @@ const Chats = ({route}) => {
                 sender={chatState.chats[item].uid}
                 text={chatState.chats[item].lastMessage.text}
                 timestamp={chatState.chats[item].lastMessage.timestamp}
+                lastMessage={chatState.chats[item].lastMessage}
                 unreadCount={
                   chatState.chats[item].unreadCount
                     ? chatState.chats[item].unreadCount

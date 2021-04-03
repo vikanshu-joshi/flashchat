@@ -1,0 +1,2 @@
+ios link react-native-vector-icons
+ios link react-native-imagepicker

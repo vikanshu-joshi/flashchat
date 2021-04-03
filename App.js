@@ -15,6 +15,7 @@ import thunk from 'redux-thunk';
 import AuthNavigator from './navigator/AuthNavigator';
 import {BookmarkedReducer} from './redux/reducer/BookmarkedReducer';
 import {ChatsReducer} from './redux/reducer/ChatsReducer';
+import {LogBox} from 'react-native';
 
 const rootReducer = combineReducers({
   bookmarkedState: BookmarkedReducer,
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const App = () => {
+  LogBox.ignoreAllLogs();
   return (
     <Provider store={store}>
       <NavigationContainer theme={DefaultTheme}>

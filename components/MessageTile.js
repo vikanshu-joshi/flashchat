@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import firebase from '../config/firebase';
 import {Colors, Text} from 'react-native-paper';
 import moment from 'moment';
@@ -48,47 +48,66 @@ function MessageTile({message, roomId, id}) {
       style={{
         flex: 1,
         flexDirection: 'row',
+        marginHorizontal: 6,
+        marginTop: 3,
         justifyContent:
           message.from === firebase.auth().currentUser.uid
             ? 'flex-end'
             : 'flex-start',
       }}>
       <View
-        style={
-          message.from === firebase.auth().currentUser.uid
-            ? styles.messageTextHolderMine
-            : styles.messageTextHolderUser
-        }>
-        <Text
-          style={
+        style={{
+          backgroundColor:
             message.from === firebase.auth().currentUser.uid
-              ? styles.messageText
-              : styles.messageText
-          }>
-          {state.text}
-        </Text>
+              ? Colors.deepPurple500
+              : Colors.grey800,
+          flexDirection: 'column',
+          borderRadius: 8,
+        }}>
+        {message.hasMedia && (
+          <Image
+            style={{
+              height: 100,
+              resizeMode: 'stretch',
+              borderTopLeftRadius: 3,
+              borderTopRightRadius: 3,
+            }}
+            source={{
+              uri: message.mediaLink,
+            }}
+            width={300}
+            height={300}
+          />
+        )}
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
+            padding: 3,
           }}>
-          <Text
-            style={
-              message.from === firebase.auth().currentUser.uid
-                ? styles.messageTime
-                : styles.messageTime
-            }>
-            {moment(state.timestamp.toDate().toLocaleString()).format(
-              'hh:mm a',
+          <Text style={styles.messageText}>{state.text}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              marginVertical: 3,
+            }}>
+            <Text
+              style={
+                message.from === firebase.auth().currentUser.uid
+                  ? styles.messageTime
+                  : styles.messageTime
+              }>
+              {moment(state.timestamp.toDate().toLocaleString()).format(
+                'hh:mm a',
+              )}
+            </Text>
+            {message.from === firebase.auth().currentUser.uid && (
+              <Ionicons
+                name={state.read ? 'checkmark-done' : 'checkmark'}
+                color="white"
+                style={{alignSelf: 'flex-end', marginHorizontal: 4}}
+              />
             )}
-          </Text>
-          {message.from === firebase.auth().currentUser.uid && (
-            <Ionicons
-              name={state.read ? 'checkmark-done' : 'checkmark'}
-              color="white"
-              style={{alignSelf: 'flex-end', marginStart: 4}}
-            />
-          )}
+          </View>
         </View>
       </View>
     </View>
@@ -96,36 +115,20 @@ function MessageTile({message, roomId, id}) {
 }
 
 const styles = StyleSheet.create({
-  messageTextHolderUser: {
-    paddingVertical: 5,
-    paddingHorizontal: 8,
-    backgroundColor: Colors.grey800,
-    borderRadius: 8,
-    marginHorizontal: 5,
-    marginTop: 2,
-    flexDirection: 'column',
-  },
   messageText: {
     color: 'white',
     fontFamily: 'Montserrat-Medium',
     fontSize: 14,
     marginEnd: 50,
+    marginHorizontal: 5,
+    marginVertical: 3,
   },
   messageTime: {
     color: Colors.grey400,
     fontSize: 10,
-    marginTop: 3,
     textAlign: 'right',
     fontFamily: 'Montserrat-Light',
-  },
-  messageTextHolderMine: {
-    paddingVertical: 5,
-    paddingHorizontal: 8,
-    backgroundColor: Colors.deepPurple500,
-    borderRadius: 8,
-    marginHorizontal: 5,
-    marginTop: 2,
-    flexDirection: 'column',
+    marginEnd: 3,
   },
 });
 

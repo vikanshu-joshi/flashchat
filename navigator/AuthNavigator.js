@@ -8,6 +8,7 @@ import DrawerNavigator from './DrawerNavigator';
 import {IconButton} from 'react-native-paper';
 import Search from '../screens/Search';
 import Messages from '../screens/Messages';
+import Calling from '../screens/Calling';
 
 const Stack = createStackNavigator();
 

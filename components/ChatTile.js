@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
-import {Avatar, Badge, Text} from 'react-native-paper';
+import {Avatar, Badge, Text, Colors} from 'react-native-paper';
 import firebase from '../config/firebase';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -17,6 +17,7 @@ function ChatTile({
   const [state, setstate] = useState({
     displayName: '...',
     photoURL: 'default',
+    online: false,
   });
   useEffect(() => {
     firebase
@@ -31,6 +32,29 @@ function ChatTile({
           photoURL: data.photoURL,
         });
       });
+    const unsubscribe = firebase
+      .firestore()
+      .collection('status')
+      .doc(sender)
+      .onSnapshot(snapshot => {
+        if (snapshot.exists) {
+          const data = snapshot.data();
+          if (data.online_status === 'online') {
+            setstate({
+              ...state,
+              online: true,
+            });
+          } else {
+            setstate({
+              ...state,
+              online: false,
+            });
+          }
+        }
+      });
+    return () => {
+      unsubscribe();
+    };
   }, [sender]);
   return (
     <TouchableOpacity
@@ -62,13 +86,30 @@ function ChatTile({
             height: '70%',
             marginHorizontal: 16,
           }}>
-          <Text
+          <View
             style={{
-              fontFamily: 'Montserrat-SemiBold',
-              fontSize: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}>
-            {state.displayName}
-          </Text>
+            <Text
+              style={{
+                fontFamily: 'Montserrat-SemiBold',
+                fontSize: 16,
+              }}>
+              {state.displayName}
+            </Text>
+            {state.online && (
+              <View
+                style={{
+                  borderRadius: 999,
+                  width: 10,
+                  height: 10,
+                  backgroundColor: Colors.green500,
+                  marginStart: 10,
+                }}
+              />
+            )}
+          </View>
           {from === firebase.auth().currentUser.uid ? (
             <View
               style={{

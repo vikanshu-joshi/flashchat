@@ -1,2 +1,3 @@
 ios link react-native-vector-icons
 ios link react-native-imagepicker
+ios link react-native-agora

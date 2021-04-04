@@ -5972,6 +5972,11 @@ react-is@^16.13.0, react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-native-agora@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-agora/-/react-native-agora-3.3.2.tgz#aaf9288c3c697a9d2ce99875524d29df9f6fef4d"
+  integrity sha512-jfDz8w2a0xWd/GaC+xoypt4bmie5JaH00hrEp/ODnPBX8sKGUg5TJqLZUchYG/rY2Yh32vS5F7q+CTNyBrls7g==
+
 react-native-codegen@^0.0.6:
   version "0.0.6"
   resolved "https://registry.npmjs.org/react-native-codegen/-/react-native-codegen-0.0.6.tgz"

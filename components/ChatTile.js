@@ -20,36 +20,27 @@ function ChatTile({
     online: false,
   });
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection('users')
-      .doc(sender)
-      .get()
-      .then(snapshot => {
-        const data = snapshot.data();
-        setstate({
-          displayName: data.displayName,
-          photoURL: data.photoURL,
-        });
-      });
     const unsubscribe = firebase
       .firestore()
       .collection('status')
       .doc(sender)
-      .onSnapshot(snapshot => {
-        if (snapshot.exists) {
-          const data = snapshot.data();
-          if (data.online_status === 'online') {
-            setstate({
-              ...state,
-              online: true,
+      .onSnapshot(s => {
+        if (s.exists) {
+          const {online_status} = s.data();
+          firebase
+            .firestore()
+            .collection('users')
+            .doc(sender)
+            .get()
+            .then(snapshot => {
+              const data = snapshot.data();
+              setstate({
+                ...state,
+                displayName: data.displayName,
+                photoURL: data.photoURL,
+                online: online_status === 'online',
+              });
             });
-          } else {
-            setstate({
-              ...state,
-              online: false,
-            });
-          }
         }
       });
     return () => {

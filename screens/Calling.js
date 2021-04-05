@@ -8,6 +8,7 @@ import RtcEngine, {
   RtcRemoteView,
   VideoRenderMode,
 } from 'react-native-agora';
+import firebase from '../config/firebase';
 
 const dimensions = {
   width: Dimensions.get('window').width,
@@ -15,54 +16,61 @@ const dimensions = {
 };
 
 function Calling({route}) {
-  const x = 12;
   const [state, setstate] = useState({
-    uid: 'KjqmpZLPTjQRyXjxaQryl1PQUL83',
-    photoUrl:
-      "'https://firebasestorage.googleapis.com/v0/b/flamechat-7181e.appspot.com/o/chats%2FMDRkF5RRIr.false?alt=media&token=e0901122-ca77-4056-aa64-dd4bd0ad537b'",
-    displayName: 'Vikanshu',
-    id: 'caller doc id',
+    from: {
+      id: route.params.from.id,
+      uid: route.params.from.uid,
+      displayName: route.params.from.displayName,
+      photoUrl: route.params.from.photoUrl,
+    },
+    to: {
+      id: route.params.to.id,
+      uid: route.params.to.uid,
+      displayName: route.params.to.displayName,
+      photoUrl: route.params.to.photoUrl,
+    },
+    timestamp: route.params.timestamp,
     engine: undefined,
     joined: false,
     micEnabled: true,
     speaker: false,
-    uid: undefined,
   });
-  console.log(state);
   useEffect(() => {
-    RtcEngine.create()
+    RtcEngine.create('61a494dd618c4586b98a0e069fd26269')
       .then(engine => {
-        engine.get;
-
         engine.addListener('Warning', warn => {
           console.log('Warning', warn);
         });
-
         engine.addListener('Error', err => {
           console.log('Error', err);
         });
-
         engine.addListener('UserJoined', (uid, elapsed) => {
-          console.log('UserJoined', uid, elapsed);
-          setstate({...state, engine: engine, uid: uid});
+          console.log('UserJoined', uid);
         });
         engine.addListener('UserOffline', (uid, reason) => {
           console.log('UserOffline', uid, reason);
         });
         engine.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
+          if (state.engine === undefined)
+            setstate({...state, engine: engine, joined: true});
           console.log('JoinChannelSuccess', channel, uid, elapsed);
-          setstate({...state, joined: true, engine: engine});
         });
-        engine.joinChannel;
         if (state.engine === undefined) setstate({...state, engine: engine});
         console.log('Agora Initialized');
       })
       .catch(err => console.log('Agora Failed', err));
-  }, [x]);
+  }, [route.params.id]);
   const joinCall = async () => {
     await state.engine.enableVideo();
     await state.engine.enableAudio();
-    await state.engine.joinChannel('demoChannel1', 'Extra Optional Data', 0);
+    await state.engine.joinChannel(
+      '00661a494dd618c4586b98a0e069fd26269IAD4pMql97Ftz4V0V7JI3cYsCnuAS04u8CGpRl0PX2rZH+IVUyEAAAAAEABqNCIi0nNsYAEAAQDSc2xg',
+      'demoChannel1',
+      'Extra Optional Data',
+      state.from.id === firebase.auth().currentUser.uid
+        ? state.from.uid
+        : state.to.uid,
+    );
   };
   const endCall = async () => {
     await state.engine.leaveChannel();
@@ -79,7 +87,6 @@ function Calling({route}) {
       });
   };
 
-  // Switch the audio playback device.
   const _switchSpeakerphone = () => {
     state.engine
       ?.setEnableSpeakerphone(!state.speaker)
@@ -98,7 +105,13 @@ function Calling({route}) {
         justifyContent: 'space-evenly',
         alignItems: 'center',
       }}>
-      {!state.joined && <Text>Incoming Call</Text>}
+      {!state.joined && (
+        <Text>
+          {state.from.id === firebase.auth().currentUser.uid
+            ? 'Outgoing Call'
+            : 'Incoming Call'}
+        </Text>
+      )}
       {!state.joined && (
         <Text
           style={{
@@ -106,16 +119,29 @@ function Calling({route}) {
             fontSize: 48,
             fontFamily: 'Montserrat-Bold',
           }}>
-          {state.displayName}
+          {state.from.id === firebase.auth().currentUser.uid
+            ? state.to.displayName
+            : state.from.displayName}
         </Text>
       )}
       {!state.joined && (
-        <Avatar.Text label={state.displayName.substr(0, 1)} size={250} />
+        <Avatar.Text
+          label={
+            state.from.id === firebase.auth().currentUser.uid
+              ? state.to.displayName.substr(0, 1)
+              : state.from.displayName.substr(0, 1)
+          }
+          size={250}
+        />
       )}
-      {state.uid && (
+      {state.joined && (
         <RtcRemoteView.SurfaceView
           style={styles.remote}
-          uid={state.uid}
+          uid={
+            state.from.id === firebase.auth().currentUser.uid
+              ? state.to.uid
+              : state.from.uid
+          }
           channelId="demoChannel1"
           renderMode={VideoRenderMode.Hidden}
           zOrderMediaOverlay={true}

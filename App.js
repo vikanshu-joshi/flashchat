@@ -27,15 +27,6 @@ const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const App = () => {
   LogBox.ignoreAllLogs();
-  AppState.addEventListener('change', state => {
-    firebase
-      .firestore()
-      .collection('status')
-      .doc(firebase.auth().currentUser.uid)
-      .set({
-        online_status: state === 'active' ? 'online' : 'offline',
-      });
-  });
   return (
     <Provider store={store}>
       <NavigationContainer theme={DefaultTheme}>
@@ -48,7 +39,3 @@ const App = () => {
 };
 
 export default App;
-
-// private void leaveChannel() {
-//   mRtcEngine.leaveChannel();
-// }

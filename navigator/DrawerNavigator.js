@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -12,14 +12,13 @@ import RequestsTabNavigator from './RequestsTabNavigator';
 import TabNavigator from './TabNavigator';
 import {useNavigation} from '@react-navigation/core';
 import {IconButton, Text} from 'react-native-paper';
-import {Image, TouchableOpacity, View} from 'react-native';
+import {AppState, Image, TouchableOpacity, View} from 'react-native';
 import logo from '../assets/images/logo.png';
 import firebase from '../config/firebase';
 import {useDispatch} from 'react-redux';
 import * as ChatActions from '../redux/action/ChatsActions';
 
 function CustomDrawerContent(props) {
-  const navigation = useNavigation();
   const dispatch = useDispatch();
   return (
     <DrawerContentScrollView {...props}>
@@ -82,8 +81,46 @@ function CustomDrawerContent(props) {
 
 const Drawer = createDrawerNavigator();
 
-const DrawerNavigator = () => {
+const DrawerNavigator = ({route}) => {
   const navigation = useNavigation();
+  useEffect(() => {
+    AppState.addEventListener('change', state => {
+      firebase
+        .firestore()
+        .collection('status')
+        .doc(firebase.auth().currentUser.uid)
+        .set({
+          online_status: state === 'active' ? 'online' : 'offline',
+          timestamp: firebase.firestore.Timestamp.now(),
+        });
+    });
+    const unsubscribe = firebase
+      .firestore()
+      .collection('users')
+      .doc(firebase.auth().currentUser.uid)
+      .collection('live')
+      .onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const data = change.doc.data();
+            navigation.navigate(RouteNames.CALL_SCREEN, {
+              ...data,
+              cid: change.doc.id,
+            });
+            firebase
+              .firestore()
+              .collection('users')
+              .doc(firebase.auth().currentUser.uid)
+              .collection('live')
+              .doc(change.doc.id)
+              .delete();
+          }
+        });
+      });
+    return () => {
+      unsubscribe();
+    };
+  }, [route]);
   return (
     <Drawer.Navigator
       initialRouteName={RouteNames.TAB_NAVIGATOR}

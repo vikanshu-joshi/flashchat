@@ -35,13 +35,18 @@ const Signup = () => {
               displayName: state.name,
               photoURL: 'default',
             });
-            firebase.firestore().collection('users').doc(result.user.uid).set({
-              displayName: state.name,
-              email: state.email,
-              photoURL: 'default',
-              password: state.password,
-              id: result.user.uid,
-            });
+            firebase
+              .firestore()
+              .collection('users')
+              .doc(result.user.uid)
+              .set({
+                displayName: state.name,
+                email: state.email,
+                photoURL: 'default',
+                password: state.password,
+                id: result.user.uid,
+                uid: Math.floor(Math.random() * 1000000000),
+              });
             navigation.reset({
               index: 0,
               routes: [{name: DRAWER_NAVIGATOR}],

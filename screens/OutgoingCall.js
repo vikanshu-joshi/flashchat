@@ -1,5 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Dimensions, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import firebase from '../config/firebase';
 import RtcEngine, {
   RtcLocalView,
@@ -17,10 +22,19 @@ const dimensions = {
   height: Dimensions.get('window').height,
 };
 
+const CALL_STATE = {
+  CALLING: 'Calling ......',
+  RINGING: 'Ringing ......',
+  CONNECTED: 'Call Connected ......',
+  DECLINED: 'Call Declined ......',
+};
+
 function OutgoingCall({route}) {
   const navigation = useNavigation();
   const currentUser = firebase.auth().currentUser;
-  const [connected, setConnected] = useState(false);
+
+  const [callState, setCallState] = useState(CALL_STATE.CALLING);
+  const [rtcEngine, setRtcEngine] = useState(undefined);
   const [state, setstate] = useState({
     callData: {
       to: {
@@ -36,20 +50,25 @@ function OutgoingCall({route}) {
         photoUrl: 'default',
       },
     },
-    rtcEngine: undefined,
     videoEnabled: true,
     audioEnabled: true,
     frontCamera: true,
-    joined: false,
     optionsVisible: true,
     remoteVideoEnabled: true,
+    joined: false,
   });
+
   useEffect(() => {
     makeCall();
     return () => {
-      if (state.rtcEngine) state.rtcEngine.destroy();
+      engine.leaveChannel();
+      engine.disableAudio();
+      engine.disableVideo();
+      engine.removeAllListeners();
+      engine.destroy();
     };
   }, [route.params.id]);
+
   const makeCall = async () => {
     const timestamp = firebase.firestore.Timestamp.now();
     const userData = await firebase
@@ -87,18 +106,21 @@ function OutgoingCall({route}) {
       .add(callData);
     setUpAgora(callData);
   };
+
   const setUpAgora = async callData => {
     const engine = await RtcEngine.create('61a494dd618c4586b98a0e069fd26269');
-    await engine.enableAudio();
     await engine.enableVideo();
+    await engine.enableAudio();
     await engine.joinChannel(
       '00661a494dd618c4586b98a0e069fd26269IAA1m8T3GvZmOEn8CyJx/lwdSzOpSN71gkFR7xfOhE3bO3ZXrgMAAAAAEAAVx5nn2FpyYAEAAQDYWnJg',
       'testChannel',
       null,
       callData.from.uid,
     );
+    await engine.muteLocalAudioStream(true);
     setUpAgoraListener(engine, callData);
   };
+
   const setUpAgoraListener = (engine, callData) => {
     engine.addListener('Warning', warn => {
       console.log('Warning', warn);
@@ -108,40 +130,59 @@ function OutgoingCall({route}) {
     });
     engine.addListener('UserJoined', (uid, elapsed) => {
       console.log('UserJoined', {uid});
-      setConnected(true);
+      setCallState(CALL_STATE.RINGING);
     });
-    engine.addListener('UserOffline', (uid, elapsed) => {
+    engine.addListener(
+      'RemoteAudioStateChanged',
+      (uid, state, reason, elapsed) => {
+        console.log('RemoteAudioStateChanged', {uid, state, reason, callState});
+        if (reason === 6) {
+          engine.muteLocalAudioStream(false);
+          setCallState(CALL_STATE.CONNECTED);
+          console.log('working');
+        }
+      },
+    );
+    engine.addListener('UserOffline', (uid, reason) => {
       console.log('UserOffline', {uid});
-      endCall();
+      if (callState === CALL_STATE.RINGING) {
+        setCallState(CALL_STATE.DECLINED);
+      } else {
+        engine.leaveChannel();
+        engine.disableAudio();
+        engine.disableVideo();
+        engine.removeAllListeners();
+        engine.leaveChannel();
+        engine.destroy();
+        navigation.goBack();
+      }
     });
-    setstate({...state, rtcEngine: engine, joined: true, callData: callData});
+    setRtcEngine(engine);
+    setstate({...state, joined: true, callData: callData});
   };
+
   const switchCamera = async () => {
-    await state.rtcEngine.switchCamera();
+    await rtcEngine.switchCamera();
   };
   const switchMicrophone = async () => {
-    if (state.rtcEngine) {
-      if (state.audioEnabled) {
-        await state.rtcEngine.disableAudio();
-      } else {
-        await state.rtcEngine.enableAudio();
-      }
+    if (rtcEngine) {
+      await rtcEngine.muteLocalAudioStream(state.audioEnabled);
       setstate({...state, audioEnabled: !state.audioEnabled});
     }
   };
   const switchVideo = async () => {
-    if (state.rtcEngine) {
-      if (state.videoEnabled) {
-        await state.rtcEngine.disableVideo();
-      } else {
-        await state.rtcEngine.enableVideo();
-      }
+    if (rtcEngine) {
+      await rtcEngine.muteLocalVideoStream(state.videoEnabled);
       setstate({...state, videoEnabled: !state.videoEnabled});
     }
   };
   const endCall = async () => {
-    if (state.rtcEngine && (connected || state.joined))
-      await state.rtcEngine.leaveChannel();
+    await rtcEngine.leaveChannel();
+    await rtcEngine.disableAudio();
+    await rtcEngine.disableVideo();
+    await rtcEngine.removeAllListeners();
+    await rtcEngine.leaveChannel();
+    await rtcEngine.destroy();
     navigation.goBack();
   };
   const getAvatar = ({displayName, photoUrl}) => {
@@ -156,85 +197,156 @@ function OutgoingCall({route}) {
       />
     );
   };
+
   return (
     <View
       style={{
         flex: 1,
       }}>
-      {!connected ? (
-        <View
+      {callState === CALL_STATE.CONNECTED ? (
+        <TouchableWithoutFeedback
           style={{
-            flex: 1,
-            flexDirection: 'column',
             width: dimensions.width,
             height: dimensions.height,
-            backgroundColor: 'grey',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-          }}>
-          {state.joined ? (
-            <RtcLocalView.SurfaceView
-              style={{
-                width: dimensions.width,
-                height: dimensions.height,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-              }}
-              channelId="testChannel"
-              renderMode={VideoRenderMode.FILL}
-            />
-          ) : (
-            <View
-              style={{
-                width: dimensions.width,
-                height: dimensions.height,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: Colors.grey800,
-              }}
-            />
-          )}
-          <Text
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+          onPress={e =>
+            setstate({...state, optionsVisible: !state.optionsVisible})
+          }>
+          <RtcRemoteView.SurfaceView
             style={{
-              fontSize: 22,
-              fontFamily: 'Montserrat-Medium',
               width: dimensions.width,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              textAlign: 'center',
-              color: 'white',
-              paddingVertical: 8,
-            }}>
-            Calling......
-          </Text>
-          {getAvatar({
-            displayName: route.params.displayName,
-            photoUrl: state.callData.to.photoUrl,
-          })}
-          <Text
+              height: dimensions.height,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+            uid={state.callData.to.uid}
+            channelId="testChannel"
+            renderMode={VideoRenderMode.FILL}
+            zOrderMediaOverlay={true}
+          />
+        </TouchableWithoutFeedback>
+      ) : state.joined ? (
+        <RtcLocalView.SurfaceView
+          style={{
+            width: dimensions.width,
+            height: dimensions.height,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+          channelId="testChannel"
+          renderMode={VideoRenderMode.FILL}
+        />
+      ) : (
+        <View
+          style={{
+            width: dimensions.width,
+            height: dimensions.height,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: Colors.grey800,
+          }}
+        />
+      )}
+      {state.optionsVisible &&
+        (callState === CALL_STATE.CONNECTED ? (
+          <View
             style={{
-              fontSize: 28,
-              fontFamily: 'Montserrat-Bold',
-              width: dimensions.width,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              textAlign: 'center',
-              color: 'white',
-              paddingVertical: 8,
+              width: '100%',
+              position: 'absolute',
+              right: 0,
+              left: 0,
+              bottom: 20,
+              flexDirection: 'row',
+              backgroundColor: 'rgba(0,0,0,0)',
+              justifyContent: 'space-evenly',
+              zIndex: 10,
             }}>
-            {state.callData.to.displayName}
-          </Text>
+            <CallButton
+              icon={
+                <Feather
+                  name={state.videoEnabled ? 'video' : 'video-off'}
+                  size={24}
+                />
+              }
+              onPress={() => switchVideo()}
+            />
+            <CallButton
+              icon={
+                <Feather
+                  name={state.audioEnabled ? 'mic' : 'mic-off'}
+                  size={24}
+                />
+              }
+              onPress={() => switchMicrophone()}
+            />
+            <CallButton
+              icon={<Ionicons name="camera-reverse-outline" size={28} />}
+              onPress={() => switchCamera()}
+            />
+            <CallButton
+              icon={
+                <MaterialIcons
+                  name="call-end"
+                  size={28}
+                  color={Colors.red700}
+                />
+              }
+              onPress={() => endCall()}
+            />
+          </View>
+        ) : (
           <View
             style={{
               width: dimensions.width,
-              flexDirection: 'row',
+              height: dimensions.height,
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'space-evenly',
+              zIndex: 10,
+              backgroundColor: 'rgba(0,0,0,0)',
             }}>
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: 'Montserrat-Medium',
+                width: dimensions.width,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                textAlign: 'center',
+                color: 'white',
+                paddingVertical: 8,
+              }}>
+              {callState}
+            </Text>
+            {getAvatar({
+              displayName: route.params.displayName,
+              photoUrl: state.callData.to.photoUrl,
+            })}
+            <Text
+              style={{
+                fontSize: 28,
+                fontFamily: 'Montserrat-Bold',
+                width: dimensions.width,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                textAlign: 'center',
+                color: 'white',
+                paddingVertical: 8,
+              }}>
+              {state.callData.to.displayName}
+            </Text>
             <TouchableOpacity onPress={e => endCall()}>
               <View
                 style={{
@@ -255,76 +367,7 @@ function OutgoingCall({route}) {
               </View>
             </TouchableOpacity>
           </View>
-        </View>
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            width: dimensions.width,
-            height: dimensions.height,
-            backgroundColor: 'grey',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-          }}>
-          <RtcRemoteView.SurfaceView
-            style={{
-              width: dimensions.width,
-              height: dimensions.height,
-            }}
-            uid={state.callData.to.uid}
-            channelId="testChannel"
-            renderMode={VideoRenderMode.FILL}
-            zOrderMediaOverlay={true}
-          />
-          {state.optionsVisible && (
-            <View
-              style={{
-                width: '100%',
-                position: 'absolute',
-                right: 0,
-                left: 0,
-                bottom: 20,
-                flexDirection: 'row',
-                backgroundColor: 'rgba(0,0,0,0)',
-                justifyContent: 'space-evenly',
-              }}>
-              <CallButton
-                icon={
-                  <Feather
-                    name={state.videoEnabled ? 'video' : 'video-off'}
-                    size={24}
-                  />
-                }
-                onPress={() => switchVideo()}
-              />
-              <CallButton
-                icon={
-                  <Feather
-                    name={state.audioEnabled ? 'mic' : 'mic-off'}
-                    size={24}
-                  />
-                }
-                onPress={() => switchMicrophone()}
-              />
-              <CallButton
-                icon={<Ionicons name="camera-reverse-outline" size={28} />}
-                onPress={() => switchCamera()}
-              />
-              <CallButton
-                icon={
-                  <MaterialIcons
-                    name="call-end"
-                    size={28}
-                    color={Colors.red700}
-                  />
-                }
-                onPress={() => endCall()}
-              />
-            </View>
-          )}
-        </View>
-      )}
+        ))}
     </View>
   );
 }

@@ -130,7 +130,7 @@ function OutgoingCall({route}) {
     await engine.enableAudio();
     await engine.joinChannel(
       AGORA_CALL_TOKEN,
-      state.channelName,
+      'testingChannel',
       null,
       callData.from.uid,
     );
@@ -139,6 +139,12 @@ function OutgoingCall({route}) {
   };
 
   const setUpAgoraListener = (engine, callData) => {
+    engine.addListener('Error', err => {
+      console.log({err});
+    });
+    engine.addListener('Warn', warn => {
+      console.log({warn});
+    });
     engine.addListener('UserJoined', (uid, elapsed) => {
       setCallState(CALL_STATE.RINGING);
     });

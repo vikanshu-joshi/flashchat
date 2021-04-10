@@ -69,7 +69,7 @@ function Calling({route}) {
     await engine.enableAudio();
     await engine.joinChannel(
       AGORA_CALL_TOKEN,
-      state.channelName,
+      'testingChannel',
       null,
       state.to.uid,
     );

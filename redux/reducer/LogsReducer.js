@@ -16,7 +16,7 @@ export const fetchAsync = () => {
       .collection('users')
       .doc(firebase.auth().currentUser.uid)
       .collection('logs');
-    ref.onSnapshot(snapshot => {
+    ref.orderBy('timestamp').onSnapshot(snapshot => {
       if (snapshot.size === 0)
         dispatch(LogActions.LoadingLogs({loading: false}));
       snapshot.docChanges().forEach(change => {

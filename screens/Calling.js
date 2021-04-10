@@ -17,6 +17,7 @@ import RtcEngine, {
 } from 'react-native-agora';
 import firebase from '../config/firebase';
 import {useNavigation} from '@react-navigation/core';
+import {AGORA_CALL_TOKEN, AGORA_APP_ID} from '../keys';
 
 const dimensions = {
   width: Dimensions.get('window').width,
@@ -46,6 +47,10 @@ function Calling({route}) {
     frontCamera: true,
     optionsVisible: true,
     joined: false,
+    channelName:
+      route.params.to.id > firebase.auth().currentUser.uid
+        ? route.params.to.id + '--' + firebase.auth().currentUser.uid
+        : firebase.auth().currentUser.uid + '--' + route.params.to.id,
   });
   useEffect(() => {
     setUpAgora();
@@ -56,15 +61,15 @@ function Calling({route}) {
       engine.removeAllListeners();
       engine.destroy();
     };
-  }, [route.params.id]);
+  }, [route.params.to.id]);
 
   const setUpAgora = async () => {
-    const engine = await RtcEngine.create('61a494dd618c4586b98a0e069fd26269');
+    const engine = await RtcEngine.create(AGORA_APP_ID);
     await engine.enableVideo();
     await engine.enableAudio();
     await engine.joinChannel(
-      '00661a494dd618c4586b98a0e069fd26269IAA1m8T3GvZmOEn8CyJx/lwdSzOpSN71gkFR7xfOhE3bO3ZXrgMAAAAAEAAVx5nn2FpyYAEAAQDYWnJg',
-      'testChannel',
+      AGORA_CALL_TOKEN,
+      state.channelName,
       null,
       state.to.uid,
     );
@@ -159,7 +164,7 @@ function Calling({route}) {
               bottom: 0,
             }}
             uid={state.from.uid}
-            channelId="testChannel"
+            channelId={state.channelName}
             renderMode={VideoRenderMode.FILL}
             zOrderMediaOverlay={true}
           />

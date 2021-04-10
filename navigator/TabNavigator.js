@@ -46,7 +46,7 @@ function TabNavigator({navigation}) {
             return (
               <View style={{flexDirection: 'row'}}>
                 <Text style={{marginEnd: 8, color: color}}>Logs</Text>
-                <Badge>9</Badge>
+                {/* <Badge>9</Badge> */}
               </View>
             );
           },

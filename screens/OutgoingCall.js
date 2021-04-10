@@ -16,6 +16,7 @@ import {Avatar, Colors, IconButton, Text} from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {AGORA_APP_ID, AGORA_CALL_TOKEN} from '../keys';
 
 const dimensions = {
   width: Dimensions.get('window').width,
@@ -56,6 +57,10 @@ function OutgoingCall({route}) {
     optionsVisible: true,
     remoteVideoEnabled: true,
     joined: false,
+    channelName:
+      route.params.id > firebase.auth().currentUser.uid
+        ? route.params.id + '--' + firebase.auth().currentUser.uid
+        : firebase.auth().currentUser.uid + '--' + route.params.id,
   });
 
   useEffect(() => {
@@ -102,18 +107,30 @@ function OutgoingCall({route}) {
       .firestore()
       .collection('users')
       .doc(route.params.id)
+      .collection('logs')
+      .add(callData);
+    await firebase
+      .firestore()
+      .collection('users')
+      .doc(firebase.auth().currentUser.uid)
+      .collection('logs')
+      .add(callData);
+    await firebase
+      .firestore()
+      .collection('users')
+      .doc(route.params.id)
       .collection('live')
       .add(callData);
     setUpAgora(callData);
   };
 
   const setUpAgora = async callData => {
-    const engine = await RtcEngine.create('61a494dd618c4586b98a0e069fd26269');
+    const engine = await RtcEngine.create(AGORA_APP_ID);
     await engine.enableVideo();
     await engine.enableAudio();
     await engine.joinChannel(
-      '00661a494dd618c4586b98a0e069fd26269IAA1m8T3GvZmOEn8CyJx/lwdSzOpSN71gkFR7xfOhE3bO3ZXrgMAAAAAEAAVx5nn2FpyYAEAAQDYWnJg',
-      'testChannel',
+      AGORA_CALL_TOKEN,
+      state.channelName,
       null,
       callData.from.uid,
     );
@@ -218,7 +235,7 @@ function OutgoingCall({route}) {
               bottom: 0,
             }}
             uid={state.callData.to.uid}
-            channelId="testChannel"
+            channelId={state.channelName}
             renderMode={VideoRenderMode.FILL}
             zOrderMediaOverlay={true}
           />

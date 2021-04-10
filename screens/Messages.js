@@ -6,6 +6,9 @@ import {useSelector} from 'react-redux';
 import MessageBar from '../components/MessageBar';
 import MessageTile from '../components/MessageTile';
 import firebase from '../config/firebase';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {TouchableOpacity} from 'react-native';
+import * as RouteNames from '../config/Routes';
 
 const Messages = ({route}) => {
   const navigation = useNavigation();
@@ -18,7 +21,22 @@ const Messages = ({route}) => {
         ? route.params.id + '--' + firebase.auth().currentUser.uid
         : firebase.auth().currentUser.uid + '--' + route.params.id,
   });
+  const callUser = () => {
+    navigation.navigate(RouteNames.OUTGOING_CALL_SCREEN, {
+      id: route.params.id,
+      displayName: route.params.displayName,
+    });
+  };
   useEffect(() => {
+    navigation.setOptions({
+      headerRight: ({tintColor}) => {
+        return (
+          <TouchableOpacity style={{marginEnd: 16}} onPress={e => callUser()}>
+            <Ionicons name="ios-call-sharp" color={tintColor} size={20} />
+          </TouchableOpacity>
+        );
+      },
+    });
     setstate({
       ...state,
       loading: true,

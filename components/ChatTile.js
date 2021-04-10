@@ -3,6 +3,7 @@ import {TouchableOpacity, View} from 'react-native';
 import {Avatar, Badge, Text, Colors} from 'react-native-paper';
 import firebase from '../config/firebase';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import moment from 'moment';
 
 function ChatTile({
   from,
@@ -18,6 +19,7 @@ function ChatTile({
     displayName: '...',
     photoURL: 'default',
     online: false,
+    lastSeen: undefined,
   });
   useEffect(() => {
     const unsubscribe = firebase
@@ -26,7 +28,7 @@ function ChatTile({
       .doc(sender)
       .onSnapshot(s => {
         if (s.exists) {
-          const {online_status} = s.data();
+          const {online_status, timestamp} = s.data();
           firebase
             .firestore()
             .collection('users')
@@ -39,6 +41,9 @@ function ChatTile({
                 displayName: data.displayName,
                 photoURL: data.photoURL,
                 online: online_status === 'online',
+                lastSeen: moment(timestamp.toDate().toLocaleString()).format(
+                  'DD/MM hh:mm a',
+                ),
               });
             });
         }
@@ -128,7 +133,7 @@ function ChatTile({
                   </Text>
                 </View>
               ) : (
-                text
+                <Text>{text}</Text>
               )}
             </View>
           ) : lastMessage.hasMedia ? (
@@ -144,7 +149,7 @@ function ChatTile({
               </Text>
             </View>
           ) : (
-            text
+            <Text>{text}</Text>
           )}
         </View>
         <View
@@ -154,7 +159,9 @@ function ChatTile({
             height: '70%',
           }}>
           {unreadCount !== 0 && <Badge>{unreadCount}</Badge>}
-          <Text>{timestamp.toDate().toLocaleDateString()}</Text>
+          <Text style={{fontSize: 12}}>
+            {timestamp.toDate().toLocaleDateString()}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>

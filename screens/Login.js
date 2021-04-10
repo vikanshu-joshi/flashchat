@@ -29,6 +29,14 @@ function Login() {
         .auth()
         .signInWithEmailAndPassword(state.email, state.password)
         .then(user => {
+          firebase
+            .firestore()
+            .collection('status')
+            .doc(firebase.auth().currentUser.uid)
+            .set({
+              online_status: state === 'active' ? 'online' : 'offline',
+              timestamp: firebase.firestore.Timestamp.now(),
+            });
           navigation.reset({
             index: 0,
             routes: [{name: DRAWER_NAVIGATOR}],

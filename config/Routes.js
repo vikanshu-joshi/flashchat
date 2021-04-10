@@ -10,6 +10,7 @@ export const GITHUB_SCREEN = 'GitHub';
 export const LOG_SCREEN = 'Logs';
 export const SETTINGS_SCREEN = 'Settings';
 export const CALL_SCREEN = 'Call';
+export const OUTGOING_CALL_SCREEN = 'Outgoing Call';
 export const SAVED_USERS = 'Saved';
 export const BLOCKED_USERS = 'Blocked';
 export const MESSAGES_SCREEN = 'Messages';

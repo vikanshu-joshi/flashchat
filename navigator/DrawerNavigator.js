@@ -94,6 +94,14 @@ const DrawerNavigator = ({route}) => {
           timestamp: firebase.firestore.Timestamp.now(),
         });
     });
+    firebase
+      .firestore()
+      .collection('status')
+      .doc(firebase.auth().currentUser.uid)
+      .set({
+        online_status: 'online',
+        timestamp: firebase.firestore.Timestamp.now(),
+      });
     const unsubscribe = firebase
       .firestore()
       .collection('users')

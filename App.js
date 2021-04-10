@@ -17,10 +17,12 @@ import {BookmarkedReducer} from './redux/reducer/BookmarkedReducer';
 import {ChatsReducer} from './redux/reducer/ChatsReducer';
 import {AppState, LogBox, PermissionsAndroid} from 'react-native';
 import firebase from './config/firebase';
+import {LogsReducer} from './redux/reducer/LogsReducer';
 
 const rootReducer = combineReducers({
   bookmarkedState: BookmarkedReducer,
   chatsState: ChatsReducer,
+  logsState: LogsReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));

@@ -72,7 +72,7 @@ function ChatTile({
         {state.photoURL === 'default' ? (
           <Avatar.Text label={state.displayName.substr(0, 1)} />
         ) : (
-          <Avatar.Image>{state.photoURL}</Avatar.Image>
+          <Avatar.Image source={{uri: state.photoURL}} />
         )}
         <View
           style={{

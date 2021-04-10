@@ -78,14 +78,7 @@ function Calling({route}) {
   };
 
   const setUpListeners = engine => {
-    engine.addListener('Warning', warn => {
-      console.log('Warning', warn);
-    });
-    engine.addListener('Error', err => {
-      console.log('Error', err);
-    });
     engine.addListener('UserOffline', (uid, reason) => {
-      console.log('UserOffline', {uid, reason});
       engine.leaveChannel();
       engine.disableAudio();
       engine.disableVideo();
@@ -95,11 +88,7 @@ function Calling({route}) {
       navigation.goBack();
     });
     engine.addListener('JoinChannelSuccess', (channel, uid, elapsed) => {
-      console.log('JoinChannelSuccess', {channel, uid});
       setstate({...state, joined: true});
-    });
-    engine.addListener('ConnectionStateChanged', (state, reason) => {
-      console.log('ConnectionStateChanged', {state, reason});
     });
     setRtcEngine(engine);
   };

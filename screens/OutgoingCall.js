@@ -122,29 +122,19 @@ function OutgoingCall({route}) {
   };
 
   const setUpAgoraListener = (engine, callData) => {
-    engine.addListener('Warning', warn => {
-      console.log('Warning', warn);
-    });
-    engine.addListener('Error', err => {
-      console.log('Error', err);
-    });
     engine.addListener('UserJoined', (uid, elapsed) => {
-      console.log('UserJoined', {uid});
       setCallState(CALL_STATE.RINGING);
     });
     engine.addListener(
       'RemoteAudioStateChanged',
       (uid, state, reason, elapsed) => {
-        console.log('RemoteAudioStateChanged', {uid, state, reason, callState});
         if (reason === 6) {
           engine.muteLocalAudioStream(false);
           setCallState(CALL_STATE.CONNECTED);
-          console.log('working');
         }
       },
     );
     engine.addListener('UserOffline', (uid, reason) => {
-      console.log('UserOffline', {uid});
       if (callState === CALL_STATE.RINGING) {
         setCallState(CALL_STATE.DECLINED);
       } else {

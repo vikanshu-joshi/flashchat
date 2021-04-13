@@ -17,7 +17,7 @@ import RtcEngine, {
 } from 'react-native-agora';
 import firebase from '../config/firebase';
 import {useNavigation} from '@react-navigation/core';
-import {AGORA_CALL_TOKEN, AGORA_APP_ID} from '../keys';
+import {AGORA_CALL_TOKEN, AGORA_APP_ID, AGORA_CHANNEL_NAME} from '../keys';
 
 const dimensions = {
   width: Dimensions.get('window').width,
@@ -69,7 +69,7 @@ function Calling({route}) {
     await engine.enableAudio();
     await engine.joinChannel(
       AGORA_CALL_TOKEN,
-      'testingChannel',
+      AGORA_CHANNEL_NAME,
       null,
       state.to.uid,
     );

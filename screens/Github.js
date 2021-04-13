@@ -1,25 +1,28 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Dimensions, StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
+import WebView from 'react-native-webview';
+
+const dimensions = {
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height,
+};
 
 const Github = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Github</Text>
+    <View
+      style={{
+        width: dimensions.width,
+        height: dimensions.height,
+        flex: 1,
+      }}>
+      <WebView
+        source={{
+          uri: 'https://github.com/vikanshu-joshi/',
+        }}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  label: {
-    fontFamily: 'Montserrat-Bold',
-    fontSize: 32,
-  },
-});
 
 export default Github;

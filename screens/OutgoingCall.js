@@ -16,7 +16,7 @@ import {Avatar, Colors, IconButton, Text} from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {AGORA_APP_ID, AGORA_CALL_TOKEN} from '../keys';
+import {AGORA_APP_ID, AGORA_CALL_TOKEN, AGORA_CHANNEL_NAME} from '../keys';
 
 const dimensions = {
   width: Dimensions.get('window').width,
@@ -130,7 +130,7 @@ function OutgoingCall({route}) {
     await engine.enableAudio();
     await engine.joinChannel(
       AGORA_CALL_TOKEN,
-      'testingChannel',
+      AGORA_CHANNEL_NAME,
       null,
       callData.from.uid,
     );

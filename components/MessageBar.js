@@ -113,7 +113,7 @@ const MessageBar = ({id, flatListRef, roomId}) => {
     const imageId = makeid(10);
     const file = await fetch(mediaUri);
     const blob = await file.blob();
-    const extension = mime.extension(mediaUri);
+    const extension = mime.extension(mediaMime);
     firebase
       .storage()
       .ref()

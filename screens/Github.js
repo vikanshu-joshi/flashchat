@@ -18,7 +18,7 @@ const Github = () => {
       }}>
       <WebView
         source={{
-          uri: 'https://github.com/vikanshu-joshi/',
+          uri: 'https://github.com/vikanshu-joshi/flashchat',
         }}
       />
     </View>

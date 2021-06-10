@@ -9,15 +9,15 @@ FlashChat is a realtime messaging & video calling application developed using us
 ## Screenshots Android :-
 
 <p align="center">
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/1.jpg" width="360" height="640"/>    
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/2.jpg" width="360" height="640"/>    
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/3.jpg" width="360" height="640"/>    
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/4.jpg" width="360" height="640"/>      
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/5.jpg" width="360" height="640"/>    
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/6.jpg" width="360" height="640"/>      
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/7.jpg" width="360" height="640"/>    
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/8.jpg" width="360" height="640"/>      
-  <img src="https://github.com/vikanshu-joshi/flashchat/blob/master/screenshots/9.jpg" width="360" height="640"/>    
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/1.jpg" width="360" height="640"/>    
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/2.jpg" width="360" height="640"/>    
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/3.jpg" width="360" height="640"/>    
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/4.jpg" width="360" height="640"/>      
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/5.jpg" width="360" height="640"/>    
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/6.jpg" width="360" height="640"/>      
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/7.jpg" width="360" height="640"/>    
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/8.jpg" width="360" height="640"/>      
+  <img src="https://github.com/vikanshu-joshi/flashchat/blob/main/screenshots/9.jpg" width="360" height="640"/>    
 </p>
 
 ## LICENSE
